@@ -1,0 +1,23 @@
+{
+  "name": "standup-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Router.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robbyice/standup-selector.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robbyice/standup-selector/issues"
+  },
+  "homepage": "https://github.com/robbyice/standup-selector#readme",
+  "devDependencies": {
+    "jasmine": "^3.2.0"
+  }
+}
