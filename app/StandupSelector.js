@@ -17,7 +17,7 @@ var adminSheet = spreadSheetService.getAdminSheet();
 var stateSheet = spreadSheetService.getStateSheet();
 var standupperSheet = spreadSheetService.getStandupperSheet();
 
-var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state');
+var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-state');
 var currentStateRowRange = rawStateSheet.getRange(rawStateSheet.getLastRow(), 1, 1, 6);
 var currentStateRowData = currentStateRowRange.getValues()[0];
 
@@ -74,10 +74,25 @@ function selectStanduppers() {
   selectedStanduppers.forEach(this.incrementSelectionForStandupper)
 }
 
+function testResponse() {
+    var pl = {
+        callback_id: 'robthor_3',
+        actions: [
+            {
+                value: 'yes'
+            }
+        ]
+
+    };
+    Logger.log(stateSheet.getLatestIssuanceId());
+    Logger.log(respondToInteraction(pl));
+}
+
 function respondToInteraction(payload) {
-  if (payload.callback_id.match(/\d+$/) ? (payload.callback_id.match(/\d+$/)[0] !== stateSheet.getLastRowNum()) : false) {
-//    do we need to handle saturday/sunday responses?
-//    || new Date() < new Date(stateSheet.getDataValues()[0])
+    console.log('PAYLOAD: ' + payload);
+    var issuanceId = payload.callback_id.match(/\d+$/);
+
+    if (issuanceId ? (parseInt(issuanceId[0]) !== stateSheet.getLastRowNum()) : false) {
     return 'This standup issuance is for an older week; it is no longer active. How dare you try to break glorious standup bot.';
   }
   
@@ -85,7 +100,7 @@ function respondToInteraction(payload) {
   
   if (payload.actions[0].value === 'yes') {    
     
-    var confirmedCols = currentStateRowData.splice(1,2).filter(function(c){ return c === 'not-confirmed' });
+    var confirmedCols = currentStateRowData.slice(1,3).filter(function(c){ return c !== 'not-confirmed' });
     var response = '';
     
     switch(confirmedCols.length) {
@@ -97,7 +112,11 @@ function respondToInteraction(payload) {
         if (confirmedCols.includes(nameOnCallback)) {
           response = 'You are already confirmed to run standup';
         } else {
-          currentStateRowData[2] = nameOnCallback
+          currentStateRowData[2] = nameOnCallback;
+          response = 'You have wisely accepted standup bot\'s offer. Glory to standup bot!';
+          response += ' You will be running standup with ' + confirmedCols.filter(function(col) {
+              return col !== nameOnCallback;
+          })[0];
         }
         break;
       case 2:
@@ -123,13 +142,18 @@ function respondToInteraction(payload) {
     return response;
     
   } else if (payload.actions[0].value === 'no') {
-    currentStateRowData[4] = currentStateRowData[4] === '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
-    currentStateRowRange.setValues([currentStateRowData]);
-    adminService.messageAdmins(admins,'[ADMIN]: ' + nameOnCallback 
-                               + ' has rejected their selection for next week\'s standup.');
-    replaceStandupper(nameOnCallback);
-    
-    return 'You will be replaced...for running standup this upcoming week.';
+    if (currentStateRowData[4].split(', ').includes(nameOnCallback)) {
+        return 'You have already rejected this issuance and will be replaced';
+    } else {
+
+        currentStateRowData[4] = currentStateRowData[4] === '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
+        currentStateRowRange.setValues([currentStateRowData]);
+        adminService.messageAdmins(admins, '[ADMIN]: ' + nameOnCallback
+            + ' has rejected their selection for next week\'s standup.');
+        replaceStandupper(nameOnCallback);
+
+        return 'You will be replaced...for running standup this upcoming week.';
+    }
   }
 }
 

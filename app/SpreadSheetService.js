@@ -1,17 +1,17 @@
 function SpreadSheetService() {
   this.getStateSheet = function() {
 //    return new StateSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state'));
-    return new StateSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-state'));
+    return new StateSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state'));
   };
   
   this.getAdminSheet = function() {
 //    return new AdminSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('admin'));
-    return new AdminSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-admin'));
+    return new AdminSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('admin'));
   };
   
   this.getStandupperSheet = function() {
 //    return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('standuppers'));
-    return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-standuppers'));
+    return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('standuppers'));
   };
 }
 
@@ -37,7 +37,7 @@ function Sheet(sheet, rangeRowStart, rangeColStart, rangeRowLength, rangeColLeng
   this.addNewRow = function(dataArray) {
     sheet.appendRow(dataArray);
   };
-};
+}
 
 AdminSheet.prototype = new Sheet;
 StateSheet.prototype = new Sheet;
@@ -45,10 +45,14 @@ StandupperSheet.prototype = new Sheet;
 
 function AdminSheet(sheet) {
   Sheet.call(this, sheet, FIRST_ROW_IGNORE_HEADER, FIRST_COL, sheet.getLastRow() - 1, NUM_ADMIN_COLUMNS);
-};
+}
 
 function StateSheet(sheet) {
   Sheet.call(this, sheet, sheet.getLastRow(), FIRST_COL, 1, NUM_STATE_COLUMNS);
+
+  this.getLatestIssuanceId = function() {
+    return sheet.getLastRow() - 1;
+  }
 };
 
 function StandupperSheet(sheet) {
