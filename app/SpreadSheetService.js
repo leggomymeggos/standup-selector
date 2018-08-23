@@ -13,7 +13,7 @@ function SpreadSheetService() {
 //    return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('standuppers'));
     return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-standuppers'));
   };
-};
+}
 
 function Sheet(sheet, rangeRowStart, rangeColStart, rangeRowLength, rangeColLength) {
   this.sheet = sheet;

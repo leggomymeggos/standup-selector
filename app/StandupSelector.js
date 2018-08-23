@@ -17,7 +17,7 @@ var adminSheet = spreadSheetService.getAdminSheet();
 var stateSheet = spreadSheetService.getStateSheet();
 var standupperSheet = spreadSheetService.getStandupperSheet();
 
-var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state')
+var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state');
 var currentStateRowRange = rawStateSheet.getRange(rawStateSheet.getLastRow(), 1, 1, 6);
 var currentStateRowData = currentStateRowRange.getValues()[0];
 
@@ -26,11 +26,32 @@ var admins = buildAdmins();
 
 function buildStanduppers() {
   return standupperSheet.getDataValues().map(this.rowToStandupper);
-};
+}
 
 function buildAdmins() {
   return adminSheet.getDataValues().map(this.rowToAdmin);
-};
+}
+
+
+// if (typeof module !== 'undefined' && module.exports) {
+//   module.exports = Thing
+// }
+
+
+// function constTest() {
+//   (function(){
+//     const TEST1 = 3;
+//     const asdfghjl = 4;
+//
+//     const a = function() {
+//       Logger.log('a' + TEST1 + asdfghjl);
+//     };
+//
+//     a();
+//
+//
+//   })();
+// }
 
 function selectStanduppers() {
   var selectedStanduppers = pickStanduppers();
@@ -51,10 +72,10 @@ function selectStanduppers() {
   notificationService.notifyStanduppersOfSelection(selectedStanduppers, 'You have been selected to run standup this upcoming week.');
   adminService.notifyAdminsOfSelection(admins, selectedStanduppers);
   selectedStanduppers.forEach(this.incrementSelectionForStandupper)
-};
+}
 
 function respondToInteraction(payload) {
-  if (payload.callback_id.match(/\d+$/) ? (payload.callback_id.match(/\d+$/)[0] != stateSheet.getLastRowNum()) : false) {
+  if (payload.callback_id.match(/\d+$/) ? (payload.callback_id.match(/\d+$/)[0] !== stateSheet.getLastRowNum()) : false) {
 //    do we need to handle saturday/sunday responses?
 //    || new Date() < new Date(stateSheet.getDataValues()[0])
     return 'This standup issuance is for an older week; it is no longer active. How dare you try to break glorious standup bot.';
@@ -63,36 +84,46 @@ function respondToInteraction(payload) {
   var nameOnCallback = payload.callback_id.split('_')[0];
   
   if (payload.actions[0].value === 'yes') {    
-    if (currentStateRowData[1] === 'not-confirmed') {
-      currentStateRowData[1] = nameOnCallback;
-    } else if (currentStatwRowData[2] === 'not-confirmed') {
-      currentStateRowData[2] = nameOnCallback;
-    }
     
+    var confirmedCols = currentStateRowData.splice(1,2).filter(function(c){ return c === 'not-confirmed' });
+    var response = '';
+    
+    switch(confirmedCols.length) {
+      case 0:
+        currentStateRowData[1] = nameOnCallback;
+        response = 'You have wisely accepted standup bot\'s offer. Glory to standup bot!';
+        break;
+      case 1:
+        if (confirmedCols.includes(nameOnCallback)) {
+          response = 'You are already confirmed to run standup';
+        } else {
+          currentStateRowData[2] = nameOnCallback
+        }
+        break;
+      case 2:
+        if (confirmedCols.includes(nameOnCallback)) {
+          response = 'You are already confirmed to run standup with ' + confirmedCols.filter(function(col) {
+            return col !== nameOnCallback;
+          })[0];
+        } else {
+          response = confirmedCols.join(',') + ' are already confirmed to run standup';
+        }
+        break;
+      default:
+        response = 'Error.';
+        break;
+    }
+
     currentStateRowRange.setValues([currentStateRowData]);
     
     var respondingStandupper = standuppers.filter(function(su){ return su.slackName === nameOnCallback })[0];
     addConfirmationForStandupper(respondingStandupper);
     adminService.messageAdmins(admins, '[ADMIN]: ' + nameOnCallback + ' has been confirmed to run the upcoming standup.');
     
-    var msg = 'You have wisely accepted standup bot\'s offer. Glory to standup bot!';
+    return response;
     
-    var currentConfirmed = currentStateRowData.splice(1,3).filter(function(confirmedCol){ return confirmedCol !== '';});
-    
-    if (currentConfirmed.length > 0) {
-      msg += 'You will be running standup with: ';
-      currentConfirmed.forEach(function(confirmed, i) {
-        msg += confirmed;
-        if (i !== currentConfirmed.length - 1) {
-          msg += ', ';
-        }
-      });
-    }
-    
-    return msg;
-    
-  } else if (payload.actions[0].value == 'no') {
-    currentStateRowData[4] = currentStateRowData[4] == '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
+  } else if (payload.actions[0].value === 'no') {
+    currentStateRowData[4] = currentStateRowData[4] === '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
     currentStateRowRange.setValues([currentStateRowData]);
     adminService.messageAdmins(admins,'[ADMIN]: ' + nameOnCallback 
                                + ' has rejected their selection for next week\'s standup.');
@@ -100,7 +131,7 @@ function respondToInteraction(payload) {
     
     return 'You will be replaced...for running standup this upcoming week.';
   }
-};
+}
 
 function checkCurrentStateAndNotifyAdmin() {
   var currentStateRow = stateSheet.getDataValues()[0];
@@ -116,7 +147,7 @@ function checkCurrentStateAndNotifyAdmin() {
   adminService.messageAdmins(admins, '[ADMIN]: Current confirmed: ' + currentConfirmed);
   adminService.messageAdmins(admins, '[ADMIN]: Awaiting response from: ' + awaitingResponse);
   adminService.messageAdmins(admins, '[ADMIN]: Current rejected: ' + rejected);
-};
+}
 
 function replaceStandupper(replacedName) {  
   var rejected = currentStateRowData[4].split(', ');
@@ -125,7 +156,7 @@ function replaceStandupper(replacedName) {
   
   while(newSelections.filter(function(e){return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName);}).length < 1) {
     newSelections.push(selectRandomStandupperByProbability());
-  };
+  }
   
   var replacementStandupper = newSelections.filter(function(e){return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName);}).slice(0,1);
     
@@ -144,14 +175,14 @@ function addConfirmationForStandupper(standupper) {
   var standupperRow = currentStandupperData[standupper.id - 1];
   standupperRow[2] = getNextMonday().toLocaleDateString();
   standupperSheet.setDataValues(currentStandupperData);
-};
+}
 
 function incrementSelectionForStandupper(standupper) {
   var currentStandupperData = standupperSheet.getDataValues();
   var standupperRow = currentStandupperData[standupper.id - 1];
   standupperRow[3] === "" ?  standupperRow[3] = 1 : standupperRow[3] += 1;
   standupperSheet.setDataValues(currentStandupperData);
-};
+}
 
 function standupperFromSlackName(slackName) {
   var indexOfRow;
@@ -165,14 +196,14 @@ function standupperFromSlackName(slackName) {
   })[0];
   
   return rowToStandupper(standupperRow, indexOfRow);
-};
+}
 
 function writeLastConfirmedStandupForStandupper(standupper) {
   var currentStandupperData = standupperSheet.getDataValues();
   var standupperRow = currentStandupperData[standupper[0].id - 1];
   standupperRow[2] = getNextMonday().toLocaleDateString();
   standupperSheet.setDataValues(currentStandupperData);
-};
+}
 
 function rowToStandupper(row_data, index) {
   return {
@@ -181,7 +212,7 @@ function rowToStandupper(row_data, index) {
     email: row_data[1],
     lastStandupRun: row_data[2],
     numTimesSelected: row_data[3],
-    forceSelection: row_data[4] === '' ? false : true,
+    forceSelection: row_data[4] !== '',
     getNormalizedFrequencyScore: function() {
       //which is faster i wonder
       
@@ -215,23 +246,16 @@ function rowToStandupper(row_data, index) {
       return [this.slackName, this.email, this.lastStandupRun, this.numTimesSelected, this.forceSelection ? this.forceSelection : ''];
     }
   }
-};
+}
 
 function rowToAdmin(row_data) {
   return {
     email: row_data[0]
   };
-};
-
-function test() {
-  Logger.log(JSON.stringify(pickStanduppers().map(function(su){return su.slackName;})));
-  Logger.log(JSON.stringify(pickStanduppers().map(function(su){return su.slackName;})));
-  Logger.log(JSON.stringify(pickStanduppers().map(function(su){return su.slackName;})));
-  Logger.log(JSON.stringify(pickStanduppers().map(function(su){return su.slackName;})));
-};
+}
 
 function pickStanduppers() {
-  var selected = []
+  var selected = [];
   var count = 0;
   
   standuppers.forEach(function(su) {
@@ -241,10 +265,10 @@ function pickStanduppers() {
   while(selected.filter(onlyUnique).length < NUM_STANDUPPERS) {
     var randomSelection = selectRandomStandupperByProbability();
     selected.push(randomSelection);
-  };
+  }
   
   return selected.filter(onlyUnique);
-};
+}
 
 function identifyStanduppers() {
   var newStandupperData = [];
@@ -256,7 +280,7 @@ function identifyStanduppers() {
   });
   
   standupperSheet.setDataValues(newStandupperData);
-};
+}
 
 function selectRandomStandupperByProbability() {
   var totalWeight = standuppers.reduce(function(acc, ele) { return acc + ele.getProbability(); }, 0);
