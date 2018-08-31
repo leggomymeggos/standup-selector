@@ -1,3 +1,4 @@
+//manual reject/latency reject into accept
 var NUM_STANDUPPERS = 2;
 
 var slackClient = new SlackClient();
@@ -145,16 +146,18 @@ function respondToInteraction(payload) {
     if (currentStateRowData[4].split(', ').includes(nameOnCallback)) {
         return 'You have already rejected this issuance and will be replaced';
     } else {
-
-        currentStateRowData[4] = currentStateRowData[4] === '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
-        currentStateRowRange.setValues([currentStateRowData]);
-        adminService.messageAdmins(admins, '[ADMIN]: ' + nameOnCallback
-            + ' has rejected their selection for next week\'s standup.');
-        replaceStandupper(nameOnCallback);
-
+      rejectAndReplace(nameOnCallback);
         return 'You will be replaced...for running standup this upcoming week.';
     }
   }
+}
+
+function rejectAndReplace(nameOnCallback) {
+  currentStateRowData[4] = currentStateRowData[4] === '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
+  currentStateRowRange.setValues([currentStateRowData]);
+  adminService.messageAdmins(admins, '[ADMIN]: ' + nameOnCallback
+                             + ' has rejected their selection for next week\'s standup.');
+  replaceStandupper(nameOnCallback);
 }
 
 function checkCurrentStateAndNotifyAdmin() {

@@ -1,17 +1,17 @@
 function SpreadSheetService() {
   this.getStateSheet = function() {
-//    return new StateSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state'));
     return new StateSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state'));
+//    return new StateSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-state'));
   };
   
   this.getAdminSheet = function() {
-//    return new AdminSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('admin'));
     return new AdminSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('admin'));
+//    return new AdminSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-admin'));
   };
   
   this.getStandupperSheet = function() {
-//    return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('standuppers'));
     return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('standuppers'));
+//    return new StandupperSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-standuppers'));
   };
 }
 
