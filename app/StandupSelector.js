@@ -6,19 +6,13 @@ var identificationService = new IdentificationService(slackClient);
 var channelService = new ChannelService(identificationService, slackClient);
 var notificationService = new NotificationService(channelService, slackClient);
 var adminService = new AdminService(notificationService);
-var spreadSheetService = new SpreadSheetService();
-
-var FIRST_ROW_IGNORE_HEADER = 2;
-var FIRST_COL = 1;
-var NUM_ADMIN_COLUMNS = 1;
-var NUM_STATE_COLUMNS = 6;
-var NUM_STANDUPPER_COLUMNS = 5;
+var spreadSheetService = new SheetFactory();
 
 var adminSheet = spreadSheetService.getAdminSheet();
 var stateSheet = spreadSheetService.getStateSheet();
 var standupperSheet = spreadSheetService.getStandupperSheet();
 
-var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('test-state');
+var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state');
 var currentStateRowRange = rawStateSheet.getRange(rawStateSheet.getLastRow(), 1, 1, 6);
 var currentStateRowData = currentStateRowRange.getValues()[0];
 

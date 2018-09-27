@@ -6,8 +6,6 @@ node_modules/
 
 
 
-
-
 ### JetBrains ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -17,7 +15,7 @@ node_modules/
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
-.idea/**/shelf
+.idea/**/shel   f
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
