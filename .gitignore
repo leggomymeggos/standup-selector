@@ -15,7 +15,7 @@ node_modules/
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
-.idea/**/shel   f
+.idea/**/shelf
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
