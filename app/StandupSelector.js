@@ -50,7 +50,7 @@ function buildAdmins() {
 //   })();
 // }
 
-function selectStanduppers() {
+function runSelectionApp() {
     var selectedStanduppers = pickStanduppers();
 
     //id of issuance is row num in spreadsheet
@@ -246,6 +246,12 @@ function rowToStandupper(row_data, index) {
         lastStandupRun: row_data[2],
         numTimesSelected: row_data[3],
         forceSelection: row_data[4] !== '',
+        // forceOmission: row_data[5] !== '',
+        isForceSelected: function() {
+            return this.forceSelection;
+        },
+        // isForceOmitted: function() {
+        // },
         getNormalizedFrequencyScore: function () {
             //which is faster i wonder
 
@@ -291,7 +297,6 @@ function rowToAdmin(row_data) {
 
 function pickStanduppers() {
     var selected = [];
-    var count = 0;
 
     standuppers.forEach(function (su) {
         if (su.forceSelection) selected.push(su);

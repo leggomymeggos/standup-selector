@@ -1,9 +1,9 @@
-Sheet = require('../app/Sheet').Sheet;
-StandupperSheet = require('../app/ChildSheets').StandupperSheet;
-AdminSheet = require('../app/ChildSheets').AdminSheet;
-StateSheet = require('../app/ChildSheets').StateSheet;
+Sheet = require('../../app/Sheet').Sheet;
+StandupperSheet = require('../../app/ChildSheets').StandupperSheet;
+AdminSheet = require('../../app/ChildSheets').AdminSheet;
+StateSheet = require('../../app/ChildSheets').StateSheet;
 
-describe("SheetFactory", () => {
+describe("SheetSpec", () => {
     let googleSheetSpy;
 
     beforeEach(function () {

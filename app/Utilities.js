@@ -29,6 +29,10 @@ function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {onlyUnique}
+}
+
 //if (!Array.prototype.includes) {
 //  Object.defineProperty(Array.prototype, 'includes', {
 //    value: function(searchElement, fromIndex) {
