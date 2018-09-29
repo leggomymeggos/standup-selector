@@ -30,7 +30,7 @@ function onlyUnique(value, index, self) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {onlyUnique}
+    module.exports = {onlyUnique};
 }
 
 //if (!Array.prototype.includes) {

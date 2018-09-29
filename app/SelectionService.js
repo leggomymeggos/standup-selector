@@ -6,11 +6,12 @@ function SelectionService(standupperService, algorithmService) {
 
     this.pickStanduppers = function () {
         var selected = [];
+
         var randomizedStanduppers = this.standupperService.getStanduppers()
             .sort(randomize);
 
         randomizedStanduppers.forEach(function (su) {
-            if (su.isForceSelected()) {
+            if (su.isForceSelected() && selected.filter(onlyUnique).length < NUM_STANDUPPERS) {
                 selected.push(su);
             }
         });

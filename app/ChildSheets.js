@@ -25,5 +25,5 @@ function StandupperSheet(sheet) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {StandupperSheet, StateSheet, AdminSheet}
+    module.exports = {StandupperSheet, StateSheet, AdminSheet};
 }

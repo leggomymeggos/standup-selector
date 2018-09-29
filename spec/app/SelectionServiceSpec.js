@@ -15,11 +15,17 @@ describe('SelectionService', () => {
             'algorithmService', ['selectRandomlyByWeight']
         );
 
+        //force Array.sort(randomize) to just reverse order
+        randomize = () => {
+            return 1;
+        };
+        //
+
         subject = new SelectionService(standupperServiceSpy, algorithmServiceSpy);
     });
 
     describe('when picking standuppers', () => {
-        xdescribe('handling forceSelection', () => {
+        describe('handling forceSelection', () => {
             let suSpy1, suSpy2, suSpy3;
 
             beforeEach(() => {
@@ -42,20 +48,17 @@ describe('SelectionService', () => {
                 const orderedResultNames = result.map((su) => {
                     return su.name;
                 });
-                expect(orderedResultNames).toEqual(['su2', 'su3'])
+                expect(orderedResultNames).toEqual(['su3', 'su2'])
             });
 
             describe('when there are more than two forceSelected people', () => {
                 it('randomly selects forceSelected people', () => {
-                    //force Array.sort(randomize) to just reverse order
-                    randomize = () => {
-                        return 1;
-                    };
-                    //
-
                     suSpy1.isForceSelected.and.returnValue(true);
+                    suSpy1.helper.and.returnValue(true);
                     suSpy2.isForceSelected.and.returnValue(true);
+                    suSpy2.helper.and.returnValue(true);
                     suSpy3.isForceSelected.and.returnValue(true);
+                    suSpy3.helper.and.returnValue(true);
 
                     const result = subject.pickStanduppers();
 
@@ -80,12 +83,6 @@ describe('SelectionService', () => {
                 [suSpy1, suSpy2, suSpy3, suSpy4]
             );
 
-            //force Array.sort(randomize) to just reverse order
-            randomize = () => {
-                return 1;
-            };
-            //
-
             algorithmServiceSpy.selectRandomlyByWeight.and.returnValues(
                 suSpy3,
                 suSpy3,
@@ -103,6 +100,7 @@ describe('SelectionService', () => {
 
 function TestStandupper(name) {
     this.name = name;
-    this.isForceSelected = jasmine.createSpy(name + '.isForceSelected');
+    this.isForceSelected = jasmine.createSpy(this.name + '.isForceSelected');
+    this.helper = jasmine.createSpy(this.name + '.helper');
 }
 
