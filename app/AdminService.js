@@ -1,10 +1,10 @@
-function AdminService(notificationService) {
-    this.notificationService = notificationService;
+function AdminService(messagingService) {
+    this.messagingService = messagingService;
 
     this.messageAdmins = function(admins, msg) {
         var self = this;
         admins.forEach(function(a) {
-            self.notificationService.notify(a, msg);
+            self.messagingService.notify(a, msg);
         });
     };
 }

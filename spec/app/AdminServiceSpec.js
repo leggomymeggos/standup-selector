@@ -2,14 +2,14 @@ AdminService = require('../../app/AdminService').AdminService
 
 describe('AdminService', () => {
     let subject;
-    let notificationServiceSpy;
+    let messagingServiceSpy;
 
     beforeEach(() =>{
-        notificationServiceSpy = jasmine.createSpyObj('notifcation',
+        messagingServiceSpy = jasmine.createSpyObj('notifcation',
             ['notify']
         );
 
-        subject = new AdminService(notificationServiceSpy);
+        subject = new AdminService(messagingServiceSpy);
     });
 
     describe('notifications', () => {
@@ -17,8 +17,8 @@ describe('AdminService', () => {
             let admins = [1, 2, 3];
             subject.messageAdmins(admins, 'msg');
 
-            expect(notificationServiceSpy.notify.calls.count()).toEqual(3);
-            expect(notificationServiceSpy.notify.calls.allArgs())
+            expect(messagingServiceSpy.notify.calls.count()).toEqual(3);
+            expect(messagingServiceSpy.notify.calls.allArgs())
                 .toEqual([
                     [1, 'msg'],
                     [2, 'msg'],

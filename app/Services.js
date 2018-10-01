@@ -20,24 +20,3 @@ function ChannelService(identificationService, slackClient) {
     return openImResponse.channel.id;
   }.bind(this);
 }
-
-function NotificationService(channelService, slackClient) {
-  this.channelService = channelService;
-  this.slackClient = slackClient;
-  
-  this.notifyStanduppersOfSelection = function(standuppers, msg){
-    standuppers.forEach(function(e) { this.notifyOfSelection(e, msg) }.bind(this));
-  };
-  
-  this.notify = function(standupper, msg) {
-    var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper);
-    
-    this.slackClient.writeToChannel(msg, slackDmUcid, standupper);
-  }.bind(this);
-  
-  this.notifyOfSelection = function(standupper, msg) {
-    var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper);
-    
-    this.slackClient.writeSelectionPromptToChannel(msg, slackDmUcid, standupper);
-  }.bind(this);
-}

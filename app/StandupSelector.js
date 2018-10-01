@@ -4,8 +4,8 @@ var NUM_STANDUPPERS = 2;
 var slackClient = new SlackClient();
 var identificationService = new IdentificationService(slackClient);
 var channelService = new ChannelService(identificationService, slackClient);
-var notificationService = new NotificationService(channelService, slackClient);
-var adminService = new AdminService(notificationService);
+var messagingService = new MessagingService(channelService, slackClient);
+var adminService = new AdminService(messagingService);
 
 var appProperties = PropertiesService.getScriptProperties();
 var sheetFactory = new SheetFactory(appProperties);
@@ -67,7 +67,7 @@ function runSelectionApp() {
 
     stateSheet.addNewRow(newStateRow);
 
-    notificationService.notifyStanduppersOfSelection(selectedStanduppers, 'You have been selected to run standup this upcoming week.');
+    messagingService.notifyStanduppersOfSelection(selectedStanduppers, 'You have been selected to run standup this upcoming week.');
 
     var msg = selectedStanduppers.map(function (e) {
         return e.slackName
@@ -197,7 +197,7 @@ function replaceStandupper(replacedName) {
         return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName);
     }).slice(0, 1);
 
-    notificationService.notifyStanduppersOfSelection(replacementStandupper,
+    messagingService.notifyStanduppersOfSelection(replacementStandupper,
         'Glory to the bot! You have been selected as a replacement to run standup this upcoming week.');
 
     //write new selection to list of ppl we've selected
