@@ -4,15 +4,15 @@ function SheetFactory(gProperties) {
     this.adminSheetName = gProperties.getProperty('ADMIN_SHEET_NAME');
     this.standupperSheetName = gProperties.getProperty('STANDUPPER_SHEET_NAME');
 
-    this.getStateSheet = function () {
+    this.getStateSheet = function() {
         return new StateSheet(this.gSpreadSheet.getSheetByName(this.stateSheetName));
     };
 
-    this.getAdminSheet = function () {
+    this.getAdminSheet = function() {
         return new AdminSheet(this.gSpreadSheet.getSheetByName(this.adminSheetName));
     };
 
-    this.getStandupperSheet = function () {
+    this.getStandupperSheet = function() {
         return new StandupperSheet(this.gSpreadSheet.getSheetByName(this.standupperSheetName));
     };
 }

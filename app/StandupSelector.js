@@ -6,24 +6,23 @@ var identificationService = new IdentificationService(slackClient);
 var channelService = new ChannelService(identificationService, slackClient);
 var notificationService = new NotificationService(channelService, slackClient);
 var adminService = new AdminService(notificationService);
-var spreadSheetService = new SheetFactory();
-
-var adminSheet = spreadSheetService.getAdminSheet();
-var stateSheet = spreadSheetService.getStateSheet();
 
 var appProperties = PropertiesService.getScriptProperties();
-var standupperSheet = spreadSheetService.getStandupperSheet(appProperties);
+var sheetFactory = new SheetFactory(appProperties);
+
+var adminSheet = sheetFactory.getAdminSheet();
+var stateSheet = sheetFactory.getStateSheet();
+var standupperSheet = sheetFactory.getStandupperSheet();
+
+var standupperService = new StandupperService();
+var algorithmService = new AlgorithmService();
+var selectionService = new SelectionService(standupperService, algorithmService);
 
 var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state');
 var currentStateRowRange = rawStateSheet.getRange(rawStateSheet.getLastRow(), 1, 1, 6);
 var currentStateRowData = currentStateRowRange.getValues()[0];
 
-var standuppers = buildStanduppers();
-var admins = buildAdmins();
-
-function buildStanduppers() {
-    return standupperSheet.getDataValues().map(this.rowToStandupper);
-}
+var standuppers = standupperService.getStanduppers();
 
 function buildAdmins() {
     return adminSheet.getDataValues().map(this.rowToAdmin);
@@ -51,7 +50,7 @@ function buildAdmins() {
 // }
 
 function runSelectionApp() {
-    var selectedStanduppers = pickStanduppers();
+    var selectedStanduppers = selectionService.pickStanduppers();
 
     //id of issuance is row num in spreadsheet
     var standupIssuanceUuid = stateSheet.getLastRowNum();
@@ -69,7 +68,12 @@ function runSelectionApp() {
     stateSheet.addNewRow(newStateRow);
 
     notificationService.notifyStanduppersOfSelection(selectedStanduppers, 'You have been selected to run standup this upcoming week.');
-    adminService.notifyAdminsOfSelection(admins, selectedStanduppers);
+
+    var msg = selectedStanduppers.map(function (e) {
+        return e.slackName
+    }).join(' and ') + ' have been selected to run standup this upcoming week.';
+    adminService.messageAdmins(admins, msg);
+
     selectedStanduppers.forEach(this.incrementSelectionForStandupper)
 }
 
@@ -247,7 +251,7 @@ function rowToStandupper(row_data, index) {
         numTimesSelected: row_data[3],
         forceSelection: row_data[4] !== '',
         // forceOmission: row_data[5] !== '',
-        isForceSelected: function() {
+        isForceSelected: function () {
             return this.forceSelection;
         },
         // isForceOmitted: function() {
