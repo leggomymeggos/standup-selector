@@ -12,6 +12,7 @@ var messagingService = new MessagingService(channelService, slackClient);
 
 var adminService = new AdminService(messagingService, adminSheet);
 var standupperService = new StandupperService(standupperSheet);
+var stateService = new StateService(stateSheet);
 
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
@@ -21,11 +22,6 @@ var currentStateRowRange = rawStateSheet.getRange(rawStateSheet.getLastRow(), 1,
 var currentStateRowData = currentStateRowRange.getValues()[0];
 
 var standuppers = standupperService.getStanduppers();
-
-// if (typeof module !== 'undefined' && module.exports) {
-//   module.exports = Thing
-// }
-
 
 // function constTest() {
 //   (function(){
@@ -45,20 +41,7 @@ var standuppers = standupperService.getStanduppers();
 function runSelectionApp() {
     var selectedStanduppers = selectionService.pickStanduppers();
 
-    //id of issuance is row num in spreadsheet
-    var standupIssuanceUuid = stateSheet.getLastRowNum();
-    var newStateRow = [
-        getNextMonday().toLocaleDateString(),
-        "not-confirmed",
-        "not-confirmed",
-        selectedStanduppers.map(function (e) {
-            return e.slackName
-        }).join(', '),
-        '',
-        standupIssuanceUuid
-    ];
-
-    stateSheet.addNewRow(newStateRow);
+    stateService.createNewStandup(selectedStanduppers);
 
     messagingService.notifyStanduppersOfSelection(selectedStanduppers, 'You have been selected to run standup this upcoming week.');
 
@@ -67,28 +50,14 @@ function runSelectionApp() {
     }).join(' and ') + ' have been selected to run standup this upcoming week.';
     adminService.messageAdmins(msg);
 
-    selectedStanduppers.forEach(this.incrementSelectionForStandupper)
-}
-
-function testResponse() {
-    var pl = {
-        callback_id: 'robthor_3',
-        actions: [
-            {
-                value: 'yes'
-            }
-        ]
-
-    };
-    Logger.log(stateSheet.getLatestIssuanceId());
-    Logger.log(respondToInteraction(pl));
+    selectedStanduppers.forEach(standupperService.incrementSelection);
 }
 
 function respondToInteraction(payload) {
     console.log('PAYLOAD: ' + payload);
     var issuanceId = payload.callback_id.match(/\d+$/);
 
-    if (issuanceId ? (parseInt(issuanceId[0]) !== stateSheet.getLastRowNum()) : false) {
+    if (issuanceId ? (parseInt(issuanceId[0]) !== stateService.getCurrentIssuanceId()) : false) {
         return 'This standup issuance is for an older week; it is no longer active. How dare you try to break glorious standup bot.';
     }
 
@@ -136,7 +105,7 @@ function respondToInteraction(payload) {
         var respondingStandupper = standuppers.filter(function (su) {
             return su.slackName === nameOnCallback
         })[0];
-        addConfirmationForStandupper(respondingStandupper);
+        standupperService.addConfirmationForStandupper(respondingStandupper);
         adminService.messageAdmins('[ADMIN]: ' + nameOnCallback + ' has been confirmed to run the upcoming standup.');
 
         return response;
@@ -180,22 +149,8 @@ function replaceStandupper(replacedName) {
     //write new selection to list of ppl we've selected
     currentStateRowData[3] += ", " + replacementStandupper[0].slackName;
     currentStateRowRange.setValues([currentStateRowData]);
-    incrementSelectionForStandupper(replacementStandupper[0]);
+    standupperService.incrementSelection(replacementStandupper[0]);
     adminService.messageAdmins('[ADMIN]: ' + replacementStandupper[0].slackName + ' has been selected as a replacement to run next week\'s standup.');
-}
-
-function addConfirmationForStandupper(standupper) {
-    var currentStandupperData = standupperSheet.getDataValues();
-    var standupperRow = currentStandupperData[standupper.id - 1];
-    standupperRow[2] = getNextMonday().toLocaleDateString();
-    standupperSheet.setDataValues(currentStandupperData);
-}
-
-function incrementSelectionForStandupper(standupper) {
-    var currentStandupperData = standupperSheet.getDataValues();
-    var standupperRow = currentStandupperData[standupper.id - 1];
-    standupperRow[3] === "" ? standupperRow[3] = 1 : standupperRow[3] += 1;
-    standupperSheet.setDataValues(currentStandupperData);
 }
 
 //useful - move to admin

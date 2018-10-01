@@ -3,25 +3,49 @@ Standupper = require('../../app/Standupper').Standupper;
 
 describe('StandupperService', () => {
     let subject;
-    let gStandupperSheetSpy;
+    let standupperSheetSpy;
 
     beforeEach(() => {
-        gStandupperSheetSpy = jasmine.createSpyObj('suSheet',
-            ['getDataValues']
+        standupperSheetSpy = jasmine.createSpyObj('suSheet',
+            ['getDataValues', 'setDataValues']
         );
 
-        subject = new StandupperService(gStandupperSheetSpy);
+        const expectedData = [
+            ['name1', 'email1', '1/1/1000', 1, 'Y'],
+            ['name2', 'email2', '2/2/2000', 2, 'Y'],
+            ['name3', 'email3', '3/3/3000', 3, 'Y']
+        ];
+
+        standupperSheetSpy.getDataValues.and.returnValue(expectedData);
+
+        subject = new StandupperService(standupperSheetSpy);
+    });
+
+    it('addConfirmation writes new date to third column', () => {
+        getNextMonday = () => {return new Date('5/5/5000');};
+
+        subject.addConfirmationForStandupper({ id: 1});
+
+        expect(standupperSheetSpy.setDataValues)
+            .toHaveBeenCalledWith([
+                ['name1', 'email1', '5/5/5000', 1, 'Y'],
+                ['name2', 'email2', '2/2/2000', 2, 'Y'],
+                ['name3', 'email3', '3/3/3000', 3, 'Y']
+            ])
+    });
+
+    it('incrementSelection increments 4th column', () => {
+        subject.incrementSelection({ id: 1});
+
+        expect(standupperSheetSpy.setDataValues)
+            .toHaveBeenCalledWith([
+                ['name1', 'email1', '1/1/1000', 2, 'Y'],
+                ['name2', 'email2', '2/2/2000', 2, 'Y'],
+                ['name3', 'email3', '3/3/3000', 3, 'Y']
+            ])
     });
 
     it('getStanduppers builds standuppers from sheet', () => {
-        const expectedData = [
-            ['name1', 'email1', '1/1/1000', '1', 'Y'],
-            ['name2', 'email2', '2/2/2000', '2', 'Y'],
-            ['name3', 'email3', '3/3/3000', '3', 'Y']
-        ];
-
-        gStandupperSheetSpy.getDataValues.and.returnValue(expectedData);
-
         const actual = subject.getStanduppers();
 
         expect(actual.length).toEqual(3);

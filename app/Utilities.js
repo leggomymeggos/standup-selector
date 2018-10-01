@@ -7,15 +7,15 @@ function mergeObjs() {
     }
   } 
   return obj;
-};
+}
 
 function buildQueryParams(obj) {
   return '?'+Object.keys(obj).reduce(function(a,k){a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&')
-};
+}
 
 function randomize() {
   return .5 - Math.random();
-};
+}
 
 function getNextMonday() {
   var today = new Date();
@@ -23,7 +23,7 @@ function getNextMonday() {
   nextMonday.setDate(today.getDate() + (1 + 7 - today.getDay()) % 7);
   
   return nextMonday;
-};
+}
 
 function onlyUnique(value, index, self) { 
     return self.indexOf(value) === index;
