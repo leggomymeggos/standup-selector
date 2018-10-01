@@ -17,8 +17,12 @@ function SelectionService(standupperService, algorithmService) {
         });
 
         while (selected.filter(onlyUnique).length < NUM_STANDUPPERS) {
-            selected.push(this.algorithmService
-                .selectRandomlyByWeight(randomizedStanduppers));
+            var nextSelected = this.algorithmService
+                .selectRandomlyByWeight(randomizedStanduppers);
+
+            if (nextSelected && !selected.includes(nextSelected) && !nextSelected.isForceOmitted()) {
+                selected.push(nextSelected);
+            }
         }
 
         return selected.filter(onlyUnique);

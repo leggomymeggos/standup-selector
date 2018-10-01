@@ -1,9 +1,14 @@
-function AdminService(messagingService) {
+function AdminService(messagingService, adminSheet) {
     this.messagingService = messagingService;
+    this.adminSheet = adminSheet;
 
-    this.messageAdmins = function(admins, msg) {
+    this.admins = this.adminSheet.getDataValues().map(function (row) {
+        return new Admin(row)
+    });
+
+    this.messageAdmins = function(msg) {
         var self = this;
-        admins.forEach(function(a) {
+        this.admins.forEach(function(a) {
             self.messagingService.notify(a, msg);
         });
     };

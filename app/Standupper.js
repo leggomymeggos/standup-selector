@@ -5,13 +5,15 @@ function Standupper(row, index) {
     this.lastStandupRun = row[2];
     this.numTimesSelected = row[3];
     this.forceSelection = row[4] !== '';
-    // forceOmission: row[5] !== '',
+    this.forceOmission = row[5] !== '';
 
     this.isForceSelected = function () {
         return this.forceSelection;
     };
-    // isForceOmitted: function() {
-    // },
+
+    this.isForceOmitted = function () {
+        return this.forceOmission;
+    };
 
     this.getNormalizedFrequencyScore = function () {
         //which is faster i wonder
@@ -47,7 +49,14 @@ function Standupper(row, index) {
 
     //Get as array corresponding to spreadsheet row
     this.toDataArray = function () {
-        return [this.slackName, this.email, this.lastStandupRun, this.numTimesSelected, this.forceSelection ? this.forceSelection : ''];
+        return [
+            this.slackName,
+            this.email,
+            this.lastStandupRun,
+            this.numTimesSelected,
+            this.forceSelection ? this.forceSelection : '',
+            this.forceOmission ? this.forceOmission : '',
+        ];
     };
 }
 

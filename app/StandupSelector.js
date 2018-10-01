@@ -1,12 +1,3 @@
-//manual reject/latency reject into accept
-var NUM_STANDUPPERS = 2;
-
-var slackClient = new SlackClient();
-var identificationService = new IdentificationService(slackClient);
-var channelService = new ChannelService(identificationService, slackClient);
-var messagingService = new MessagingService(channelService, slackClient);
-var adminService = new AdminService(messagingService);
-
 var appProperties = PropertiesService.getScriptProperties();
 var sheetFactory = new SheetFactory(appProperties);
 
@@ -14,7 +5,14 @@ var adminSheet = sheetFactory.getAdminSheet();
 var stateSheet = sheetFactory.getStateSheet();
 var standupperSheet = sheetFactory.getStandupperSheet();
 
-var standupperService = new StandupperService();
+var slackClient = new SlackClient();
+var identificationService = new IdentificationService(slackClient);
+var channelService = new ChannelService(identificationService, slackClient);
+var messagingService = new MessagingService(channelService, slackClient);
+
+var adminService = new AdminService(messagingService, adminSheet);
+var standupperService = new StandupperService(standupperSheet);
+
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
 
@@ -23,11 +21,6 @@ var currentStateRowRange = rawStateSheet.getRange(rawStateSheet.getLastRow(), 1,
 var currentStateRowData = currentStateRowRange.getValues()[0];
 
 var standuppers = standupperService.getStanduppers();
-
-function buildAdmins() {
-    return adminSheet.getDataValues().map(this.rowToAdmin);
-}
-
 
 // if (typeof module !== 'undefined' && module.exports) {
 //   module.exports = Thing
@@ -72,7 +65,7 @@ function runSelectionApp() {
     var msg = selectedStanduppers.map(function (e) {
         return e.slackName
     }).join(' and ') + ' have been selected to run standup this upcoming week.';
-    adminService.messageAdmins(admins, msg);
+    adminService.messageAdmins(msg);
 
     selectedStanduppers.forEach(this.incrementSelectionForStandupper)
 }
@@ -144,7 +137,7 @@ function respondToInteraction(payload) {
             return su.slackName === nameOnCallback
         })[0];
         addConfirmationForStandupper(respondingStandupper);
-        adminService.messageAdmins(admins, '[ADMIN]: ' + nameOnCallback + ' has been confirmed to run the upcoming standup.');
+        adminService.messageAdmins('[ADMIN]: ' + nameOnCallback + ' has been confirmed to run the upcoming standup.');
 
         return response;
 
@@ -161,25 +154,9 @@ function respondToInteraction(payload) {
 function rejectAndReplace(nameOnCallback) {
     currentStateRowData[4] = currentStateRowData[4] === '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
     currentStateRowRange.setValues([currentStateRowData]);
-    adminService.messageAdmins(admins, '[ADMIN]: ' + nameOnCallback
+    adminService.messageAdmins('[ADMIN]: ' + nameOnCallback
         + ' has rejected their selection for next week\'s standup.');
     replaceStandupper(nameOnCallback);
-}
-
-function checkCurrentStateAndNotifyAdmin() {
-    var currentStateRow = stateSheet.getDataValues()[0];
-
-    var currentConfirmed = currentStateRow.slice(1, 3).join(', ');
-    var selected = currentStateRow[3].split(',');
-    var rejected = currentStateRow[4].split(',');
-
-    var awaitingResponse = selected.filter(function (s) {
-        return rejected.indexOf(s) === -1;
-    }).join(', ');
-
-    adminService.messageAdmins(admins, '[ADMIN]: Current confirmed: ' + currentConfirmed);
-    adminService.messageAdmins(admins, '[ADMIN]: Awaiting response from: ' + awaitingResponse);
-    adminService.messageAdmins(admins, '[ADMIN]: Current rejected: ' + rejected);
 }
 
 function replaceStandupper(replacedName) {
@@ -204,7 +181,7 @@ function replaceStandupper(replacedName) {
     currentStateRowData[3] += ", " + replacementStandupper[0].slackName;
     currentStateRowRange.setValues([currentStateRowData]);
     incrementSelectionForStandupper(replacementStandupper[0]);
-    adminService.messageAdmins(admins, '[ADMIN]: ' + replacementStandupper[0].slackName + ' has been selected as a replacement to run next week\'s standup.');
+    adminService.messageAdmins('[ADMIN]: ' + replacementStandupper[0].slackName + ' has been selected as a replacement to run next week\'s standup.');
 }
 
 function addConfirmationForStandupper(standupper) {
@@ -221,99 +198,7 @@ function incrementSelectionForStandupper(standupper) {
     standupperSheet.setDataValues(currentStandupperData);
 }
 
-function standupperFromSlackName(slackName) {
-    var indexOfRow;
-    var standupperRow = standupperSheet.getDataValues().filter(function (row, index) {
-        if (row[0] === slackName) {
-            indexOfRow = index;
-            return true;
-        } else {
-            return false;
-        }
-    })[0];
-
-    return rowToStandupper(standupperRow, indexOfRow);
-}
-
-function writeLastConfirmedStandupForStandupper(standupper) {
-    var currentStandupperData = standupperSheet.getDataValues();
-    var standupperRow = currentStandupperData[standupper[0].id - 1];
-    standupperRow[2] = getNextMonday().toLocaleDateString();
-    standupperSheet.setDataValues(currentStandupperData);
-}
-
-function rowToStandupper(row_data, index) {
-    return {
-        id: (index + 1),
-        slackName: row_data[0],
-        email: row_data[1],
-        lastStandupRun: row_data[2],
-        numTimesSelected: row_data[3],
-        forceSelection: row_data[4] !== '',
-        // forceOmission: row_data[5] !== '',
-        isForceSelected: function () {
-            return this.forceSelection;
-        },
-        // isForceOmitted: function() {
-        // },
-        getNormalizedFrequencyScore: function () {
-            //which is faster i wonder
-
-//      var maxTimesSelected = standuppers.reduce(function(acc, ele) {
-//        return Math.max(acc, ele.getNumTimesSelected());
-//      }, standuppers[0].getNumTimesSelected());
-
-            var maxTimesSelected = Math.max.apply(Math, standuppers.map(function (su) {
-                return su.getNumTimesSelected();
-            }));
-
-            return 100 -
-                (this.getNumTimesSelected() === maxTimesSelected ? 100 : (100 * this.getNumTimesSelected()) / maxTimesSelected);
-        },
-        getNormalizedProximityScore: function () {
-            var maxNumWeeksSince = standuppers.reduce(function (acc, ele) {
-                return Math.max(acc, ele.getNumWeeksSinceLastStandupRun());
-            }, standuppers[0].getNumWeeksSinceLastStandupRun());
-
-            return this.getNumWeeksSinceLastStandupRun() === maxNumWeeksSince ? 100 : (100 * this.getNumWeeksSinceLastStandupRun()) / maxNumWeeksSince;
-        },
-        getProbability: function () {
-            return Math.floor((this.getNormalizedProximityScore() * 0.60) + (this.getNormalizedFrequencyScore() * 0.40));
-        },
-        getNumWeeksSinceLastStandupRun: function () {
-            return Math.floor((new Date() - this.lastStandupRun) / 1000 / 60 / 60 / 24 / 7);
-        },
-        getNumTimesSelected: function () {
-            return this.numTimesSelected === '' ? 0 : this.numTimesSelected;
-        },
-        //Get as array corresponding to spreadsheet row
-        toDataArray: function () {
-            return [this.slackName, this.email, this.lastStandupRun, this.numTimesSelected, this.forceSelection ? this.forceSelection : ''];
-        }
-    }
-}
-
-function rowToAdmin(row_data) {
-    return {
-        email: row_data[0]
-    };
-}
-
-function pickStanduppers() {
-    var selected = [];
-
-    standuppers.forEach(function (su) {
-        if (su.forceSelection) selected.push(su);
-    });
-
-    while (selected.filter(onlyUnique).length < NUM_STANDUPPERS) {
-        var randomSelection = selectRandomStandupperByProbability();
-        selected.push(randomSelection);
-    }
-
-    return selected.filter(onlyUnique);
-}
-
+//useful - move to admin
 function identifyStanduppers() {
     var newStandupperData = [];
     standuppers.forEach(function (su, index) {
@@ -326,6 +211,24 @@ function identifyStanduppers() {
     standupperSheet.setDataValues(newStandupperData);
 }
 
+//useful - move to admin
+function checkCurrentStateAndNotifyAdmin() {
+    var currentStateRow = stateSheet.getDataValues()[0];
+
+    var currentConfirmed = currentStateRow.slice(1, 3).join(', ');
+    var selected = currentStateRow[3].split(',');
+    var rejected = currentStateRow[4].split(',');
+
+    var awaitingResponse = selected.filter(function (s) {
+        return rejected.indexOf(s) === -1;
+    }).join(', ');
+
+    adminService.messageAdmins('[ADMIN]: Current confirmed: ' + currentConfirmed);
+    adminService.messageAdmins('[ADMIN]: Awaiting response from: ' + awaitingResponse);
+    adminService.messageAdmins('[ADMIN]: Current rejected: ' + rejected);
+}
+
+//still being used herein by replacement flow
 function selectRandomStandupperByProbability() {
     var totalWeight = standuppers.reduce(function (acc, ele) {
         return acc + ele.getProbability();
@@ -343,7 +246,6 @@ function selectRandomStandupperByProbability() {
             return false;
         }
     });
-
     return selected;
 }
 

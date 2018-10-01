@@ -1,29 +1,37 @@
-AdminService = require('../../app/AdminService').AdminService
+AdminService = require('../../app/AdminService').AdminService;
+Admin = require('../../app/Admin').Admin;
 
 describe('AdminService', () => {
     let subject;
-    let messagingServiceSpy;
+    let messagingServiceSpy, adminSheetSpy;
 
-    beforeEach(() =>{
+    beforeEach(() => {
         messagingServiceSpy = jasmine.createSpyObj('notifcation',
             ['notify']
         );
 
-        subject = new AdminService(messagingServiceSpy);
+        adminSheetSpy = jasmine.createSpyObj('adminSheet',
+            ['getDataValues']
+        );
+
+        adminSheetSpy.getDataValues.and.returnValue([
+            ['email1'],
+            ['email2'],
+            ['email3']
+        ]);
+
+        subject = new AdminService(messagingServiceSpy, adminSheetSpy);
     });
 
-    describe('notifications', () => {
-        it('notifySelection sends msg of selection', () => {
-            let admins = [1, 2, 3];
-            subject.messageAdmins(admins, 'msg');
+    it('messageAdmins the expected admins with the correct message', () => {
+        subject.messageAdmins('msg');
 
-            expect(messagingServiceSpy.notify.calls.count()).toEqual(3);
-            expect(messagingServiceSpy.notify.calls.allArgs())
-                .toEqual([
-                    [1, 'msg'],
-                    [2, 'msg'],
-                    [3, 'msg']
-                ]);
-        });
+        expect(messagingServiceSpy.notify.calls.count()).toEqual(3);
+        expect(messagingServiceSpy.notify.calls.allArgs())
+            .toEqual([
+                [new Admin(['email1']), 'msg'],
+                [new Admin(['email2']), 'msg'],
+                [new Admin(['email3']), 'msg']
+            ]);
     });
 });
