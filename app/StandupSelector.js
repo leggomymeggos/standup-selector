@@ -138,13 +138,13 @@ function replaceStandupper(replacedName) {
     //rewrite this
     while (newSelections
         .filter(function (e) {
-            return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && forceOmitted.includes(e.slackName);
+            return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && !forceOmitted.includes(e.slackName);
         }).length < 1) {
         newSelections.push(selectRandomStandupperByProbability());
     }
 
     var replacementStandupper = newSelections.filter(function (e) {
-        return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && forceOmitted.includes(e.slackName);
+        return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && !forceOmitted.includes(e.slackName);
     }).slice(0, 1);
 
     messagingService.notifyStanduppersOfSelection(replacementStandupper,
