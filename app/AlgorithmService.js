@@ -1,5 +1,5 @@
 function AlgorithmService() {
-    this.selectRandomlyByWeight = (randomProbables) => {
+    this.selectRandomlyByWeight = function (randomProbables) {
         var totalWeight = randomProbables.reduce(function (acc, ele) {
             return acc + ele.getProbability();
         }, 0);
