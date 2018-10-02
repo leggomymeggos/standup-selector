@@ -154,7 +154,7 @@ function replaceStandupper(replacedName) {
         ' has been selected as a replacement to run standup the week of ' + stateService.getCurrentStandupDateString());
 }
 
-//useful - move to admin
+//TODO - move to admin
 function identifyStanduppers() {
     var newStandupperData = [];
     standuppers.forEach(function (su, index) {
@@ -167,7 +167,7 @@ function identifyStanduppers() {
     standupperSheet.setDataValues(newStandupperData);
 }
 
-//useful - move to admin
+//TODO - move to admin
 function checkCurrentStateAndNotifyAdmin() {
     var currentStateRow = stateSheet.getDataValues()[0];
 
@@ -186,7 +186,7 @@ function checkCurrentStateAndNotifyAdmin() {
     adminService.messageAdmins(adminPrefix + 'Current rejected: ' + rejected);
 }
 
-//still being used herein by replacement flow
+//TODO - still being used herein by replacement flow
 function selectRandomStandupperByProbability() {
     var totalWeight = standuppers.reduce(function (acc, ele) {
         return acc + ele.getProbability();
