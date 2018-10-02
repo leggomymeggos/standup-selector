@@ -4,10 +4,10 @@ AdminSheet = require('../../app/ChildSheets').AdminSheet;
 StateSheet = require('../../app/ChildSheets').StateSheet;
 
 describe("SheetSpec", () => {
-    let googleSheetSpy;
+    let gSheetSpy;
 
     beforeEach(function () {
-        googleSheetSpy = jasmine.createSpyObj('sheet', ['getRange', 'getLastRow', 'appendRow']);
+        gSheetSpy = jasmine.createSpyObj('sheet', ['getRange', 'getLastRow', 'appendRow']);
     });
 
     describe('Sheet', () => {
@@ -21,14 +21,14 @@ describe("SheetSpec", () => {
 
         beforeEach(() => {
             genericSheet = new Sheet(
-                googleSheetSpy,
+                gSheetSpy,
                 rowStart,
                 colStart,
                 rowLength,
                 colLength);
 
             rangeSpy = jasmine.createSpyObj('range', ['getValues', 'setValues']);
-            googleSheetSpy.getRange.and.returnValue(rangeSpy);
+            gSheetSpy.getRange.and.returnValue(rangeSpy);
         });
 
         it('getDataValues', () => {
@@ -36,7 +36,7 @@ describe("SheetSpec", () => {
             rangeSpy.getValues.and.returnValue(expectedDataValues);
 
             const actualDataValues = genericSheet.getDataValues();
-            expect(googleSheetSpy.getRange).toHaveBeenCalledWith(
+            expect(gSheetSpy.getRange).toHaveBeenCalledWith(
                 rowStart,
                 colStart,
                 rowLength,
@@ -49,7 +49,7 @@ describe("SheetSpec", () => {
             const expectedDataValues = [[]];
             genericSheet.setDataValues(expectedDataValues);
 
-            expect(googleSheetSpy.getRange).toHaveBeenCalledWith(
+            expect(gSheetSpy.getRange).toHaveBeenCalledWith(
                 rowStart,
                 colStart,
                 rowLength,
@@ -59,7 +59,7 @@ describe("SheetSpec", () => {
         });
 
         it('getLastRowNum', () => {
-            googleSheetSpy.getLastRow.and.returnValue(1);
+            gSheetSpy.getLastRow.and.returnValue(1);
             const actual = genericSheet.getLastRowNum();
             expect(actual).toEqual(1);
         });
@@ -67,7 +67,7 @@ describe("SheetSpec", () => {
         it('addNewRow', () => {
             let expectedDataArray = [];
             genericSheet.addNewRow(expectedDataArray)
-            expect(googleSheetSpy.appendRow).toHaveBeenCalledWith(expectedDataArray);
+            expect(gSheetSpy.appendRow).toHaveBeenCalledWith(expectedDataArray);
         })
     });
 
@@ -76,8 +76,8 @@ describe("SheetSpec", () => {
         const numRowsWithHeader = 3;
 
         beforeEach(() => {
-            googleSheetSpy.getLastRow.and.returnValue(numRowsWithHeader);
-            standupperSheet = new StandupperSheet(googleSheetSpy);
+            gSheetSpy.getLastRow.and.returnValue(numRowsWithHeader);
+            standupperSheet = new StandupperSheet(gSheetSpy);
         });
 
         it("was created with the correct properties", function () {
@@ -93,8 +93,8 @@ describe("SheetSpec", () => {
         const numRowsWithHeader = 3;
 
         beforeEach(() => {
-            googleSheetSpy.getLastRow.and.returnValue(numRowsWithHeader);
-            adminSheet = new AdminSheet(googleSheetSpy);
+            gSheetSpy.getLastRow.and.returnValue(numRowsWithHeader);
+            adminSheet = new AdminSheet(gSheetSpy);
         });
 
         it("was created with the correct properties", function () {
@@ -110,8 +110,8 @@ describe("SheetSpec", () => {
         let currentStateRow = 3;
 
         beforeEach(() => {
-            googleSheetSpy.getLastRow.and.returnValue(currentStateRow);
-            stateSheet = new StateSheet(googleSheetSpy);
+            gSheetSpy.getLastRow.and.returnValue(currentStateRow);
+            stateSheet = new StateSheet(gSheetSpy);
         });
 
         it("was created with the correct properties", function () {

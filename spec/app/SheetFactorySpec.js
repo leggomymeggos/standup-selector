@@ -29,12 +29,21 @@ describe("SheetFactory", () => {
     });
 
     it('provides a correctly created stateSheet', () => {
+        gSheetSpy.getLastRow.and.returnValue(2);
         const result = subject.getStateSheet();
 
         expect(gPropertiesSpy.getProperty).toHaveBeenCalledWith('STATE_SHEET_NAME');
         expect(gActiveSpreadsheetSpy.getSheetByName).toHaveBeenCalledWith('SHEET_NAME');
         expect(result instanceof StateSheet).toEqual(true);
         expect(result.sheet).toEqual(gSheetSpy);
+    });
+
+    it('handles stateSheet creation when no state exists', () => {
+        gSheetSpy.getLastRow.and.returnValue(1);
+
+        const result = subject.getStateSheet();
+
+        expect(result.rangeRowStart).toEqual(2);
     });
 
     it('provides a correctly created adminSheet', () => {

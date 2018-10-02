@@ -13,7 +13,7 @@ function AdminSheet(sheet) {
 }
 
 function StateSheet(sheet) {
-    Sheet.call(this, sheet, sheet.getLastRow(), FIRST_COL, 1, NUM_STATE_COLUMNS);
+    Sheet.call(this, sheet, sheet.getLastRow() === 1 ? 2 : sheet.getLastRow(), FIRST_COL, 1, NUM_STATE_COLUMNS);
 
     this.getLatestIssuanceId = function () {
         return sheet.getLastRow() - 1;
