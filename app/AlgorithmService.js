@@ -21,7 +21,7 @@ function AlgorithmService() {
 
         return selected;
     };
-};
+}
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AlgorithmService;
