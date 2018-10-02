@@ -20,5 +20,5 @@ function MessagingService(channelService, slackClient) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {MessagingService}
+    module.exports = MessagingService
 }

@@ -23,5 +23,5 @@ function Sheet(sheet, rangeRowStart, rangeColStart, rangeRowLength, rangeColLeng
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {Sheet}
+    module.exports = Sheet
 }

@@ -1,5 +1,5 @@
-SheetFactory = require('../../app/SheetFactory').SheetFactory;
-Sheet = require('../../app/Sheet').Sheet;
+SheetFactory = require('../../app/SheetFactory');
+Sheet = require('../../app/Sheet');
 StateSheet = require('../../app/ChildSheets').StateSheet;
 AdminSheet = require('../../app/ChildSheets').AdminSheet;
 StandupperSheet = require('../../app/ChildSheets').StandupperSheet;

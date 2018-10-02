@@ -30,7 +30,7 @@ function onlyUnique(value, index, self) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {onlyUnique};
+    module.exports = onlyUnique;
 }
 
 // https://tc39.github.io/ecma262/#sec-array.prototype.includes

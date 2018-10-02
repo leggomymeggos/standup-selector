@@ -1,5 +1,5 @@
-StandupperService = require('../../app/StandupperService').StandupperService;
-Standupper = require('../../app/Standupper').Standupper;
+StandupperService = require('../../app/StandupperService');
+Standupper = require('../../app/Standupper');
 
 describe('StandupperService', () => {
     let subject;

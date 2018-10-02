@@ -3,5 +3,5 @@ function Admin(row) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {Admin}
+    module.exports = Admin
 }

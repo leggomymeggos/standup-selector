@@ -61,5 +61,5 @@ function Standupper(row, index) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {Standupper}
+    module.exports = Standupper
 }

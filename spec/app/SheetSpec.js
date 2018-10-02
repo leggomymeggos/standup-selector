@@ -1,4 +1,4 @@
-Sheet = require('../../app/Sheet').Sheet;
+Sheet = require('../../app/Sheet');
 StandupperSheet = require('../../app/ChildSheets').StandupperSheet;
 AdminSheet = require('../../app/ChildSheets').AdminSheet;
 StateSheet = require('../../app/ChildSheets').StateSheet;

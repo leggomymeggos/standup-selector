@@ -1,5 +1,5 @@
-AdminService = require('../../app/AdminService').AdminService;
-Admin = require('../../app/Admin').Admin;
+AdminService = require('../../app/AdminService');
+Admin = require('../../app/Admin');
 
 describe('AdminService', () => {
     let subject;

@@ -1,4 +1,4 @@
-StateService = require('../../app/StateService').StateService;
+StateService = require('../../app/StateService');
 
 describe('StateService', () => {
     let subject;

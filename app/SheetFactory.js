@@ -18,5 +18,5 @@ function SheetFactory(gProperties) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {SheetFactory};
+    module.exports = SheetFactory;
 }

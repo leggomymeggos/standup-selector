@@ -15,5 +15,5 @@ function AdminService(messagingService, adminSheet) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {AdminService}
+    module.exports = AdminService
 }

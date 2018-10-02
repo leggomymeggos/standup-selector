@@ -1,4 +1,4 @@
-MessagingService = require('../../app/MessagingService').MessagingService;
+MessagingService = require('../../app/MessagingService');
 
 describe('MessagingService', () => {
     let subject;

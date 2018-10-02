@@ -28,5 +28,5 @@ function SelectionService(standupperService, algorithmService) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {SelectionService}
+    module.exports = SelectionService
 }

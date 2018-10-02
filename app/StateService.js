@@ -75,5 +75,5 @@ function StateService(stateSheet) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {StateService}
+    module.exports = StateService
 }
