@@ -21,6 +21,17 @@ function StandupperService(standupperSheet) {
         standupperRow[2] = getNextMonday().toLocaleDateString();
         standupperSheet.setDataValues(standupperTable);
     };
+
+    this.getOmittedStandupperNames = function () {
+        return this.getStanduppers()
+            .filter(function (su) {
+                return su.isForceOmitted();
+            })
+            .map(function (su) {
+                return su.slackName;
+            });
+
+    }
 }
 
 if (typeof module !== 'undefined' && module.exports) {

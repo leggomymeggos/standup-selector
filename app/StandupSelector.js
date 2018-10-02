@@ -51,7 +51,7 @@ function runSelectionApp() {
 }
 
 function respondToInteraction(payload) {
-    console.log('PAYLOAD: ' + payload);
+    console.log('PAYLOAD: ' + JSON.stringify(payload));
     var issuanceId = payload.callback_id.match(/\d+$/);
 
     if (issuanceId ? (parseInt(issuanceId[0]) !== stateService.getCurrentIssuanceId()) : false) {
@@ -91,7 +91,7 @@ function respondToInteraction(payload) {
             case 2:
                 if (confirmed.includes(nameOnCallback)) {
                     response = 'You are already confirmed to run standup the week of ' +
-                    stateService.getCurrentStandupDateString();
+                        stateService.getCurrentStandupDateString();
 
                     var standupPartners = confirmed.filter(function (col) {
                         return col !== nameOnCallback;
@@ -131,18 +131,20 @@ function respondToInteraction(payload) {
 function replaceStandupper(replacedName) {
     var rejected = stateService.getRejectedStandupperNames();
     var alreadySelected = stateService.getSelectedStandupperNames();
+    var forceOmitted = standupperService.getOmittedStandupperNames();
     var newSelections = [];
 
     //replacement
     //rewrite this
-    while (newSelections.filter(function (e) {
-        return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName);
-    }).length < 1) {
+    while (newSelections
+        .filter(function (e) {
+            return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && forceOmitted.includes(e.slackName);
+        }).length < 1) {
         newSelections.push(selectRandomStandupperByProbability());
     }
 
     var replacementStandupper = newSelections.filter(function (e) {
-        return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName);
+        return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && forceOmitted.includes(e.slackName);
     }).slice(0, 1);
 
     messagingService.notifyStanduppersOfSelection(replacementStandupper,

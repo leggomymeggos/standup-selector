@@ -11,9 +11,9 @@ describe('StandupperService', () => {
         );
 
         const expectedData = [
-            ['name1', 'email1', '1/1/1000', 1, 'Y'],
-            ['name2', 'email2', '2/2/2000', 2, 'Y'],
-            ['name3', 'email3', '3/3/3000', 3, 'Y']
+            ['name1', 'email1', '1/1/1000', 1, '', ''],
+            ['name2', 'email2', '2/2/2000', 2, '', ''],
+            ['name3', 'email3', '3/3/3000', 3, '', '']
         ];
 
         standupperSheetSpy.getDataValues.and.returnValue(expectedData);
@@ -21,27 +21,27 @@ describe('StandupperService', () => {
         subject = new StandupperService(standupperSheetSpy);
     });
 
-    it('addConfirmation writes new date to third column', () => {
+    it('addConfirmation writes new date to third column for standupper', () => {
         getNextMonday = () => {return new Date('5/5/5000');};
 
         subject.addConfirmationForStandupper({ id: 1});
 
         expect(standupperSheetSpy.setDataValues)
             .toHaveBeenCalledWith([
-                ['name1', 'email1', '5/5/5000', 1, 'Y'],
-                ['name2', 'email2', '2/2/2000', 2, 'Y'],
-                ['name3', 'email3', '3/3/3000', 3, 'Y']
+                ['name1', 'email1', '5/5/5000', 1, '', ''],
+                ['name2', 'email2', '2/2/2000', 2, '', ''],
+                ['name3', 'email3', '3/3/3000', 3, '', '']
             ])
     });
 
-    it('incrementSelection increments 4th column', () => {
+    it('incrementSelection increments 4th column for standupper', () => {
         subject.incrementSelection({ id: 1});
 
         expect(standupperSheetSpy.setDataValues)
             .toHaveBeenCalledWith([
-                ['name1', 'email1', '1/1/1000', 2, 'Y'],
-                ['name2', 'email2', '2/2/2000', 2, 'Y'],
-                ['name3', 'email3', '3/3/3000', 3, 'Y']
+                ['name1', 'email1', '1/1/1000', 2, '', ''],
+                ['name2', 'email2', '2/2/2000', 2, '', ''],
+                ['name3', 'email3', '3/3/3000', 3, '', '']
             ])
     });
 
@@ -55,5 +55,19 @@ describe('StandupperService', () => {
         expect(actual[1].slackName).toEqual('name2');
         expect(actual[2].id).toEqual(3);
         expect(actual[2].slackName).toEqual('name3');
+    });
+
+    it('getOmittedStandupperNames returns list of omitted names', () => {
+        const expectedData = [
+            ['name1', 'email1', '1/1/1000', 1, '', ''],
+            ['name2', 'email2', '2/2/2000', 2, '', 'Y'],
+            ['name3', 'email3', '3/3/3000', 3, '', 'Y']
+        ];
+
+        standupperSheetSpy.getDataValues.and.returnValue(expectedData);
+
+        const actual = subject.getOmittedStandupperNames();
+
+        expect(actual).toEqual(['name2', 'name3']);
     });
 });
