@@ -24,11 +24,14 @@ function runSelectionApp() {
 
     stateService.createNewStandup(selectedStanduppers);
 
-    messagingService.notifyStanduppersOfSelection(selectedStanduppers, 'You have been selected to run standup this upcoming week.');
+    messagingService.notifyStanduppersOfSelection(
+        selectedStanduppers,
+        'You have been selected to run standup for the week of' + stateService.getCurrentStandupDateString()
+    );
 
     var msg = selectedStanduppers.map(function (e) {
         return e.slackName
-    }).join(' and ') + ' have been selected to run standup this upcoming week.';
+    }).join(' and ') + ' have been selected to run standup the week of' + stateService.getCurrentStandupDateString();
     adminService.messageAdmins(msg);
 
     selectedStanduppers.forEach(standupperService.incrementSelection);
@@ -51,27 +54,39 @@ function respondToInteraction(payload) {
 
         switch (confirmed.length) {
             case 0:
-                stateService.recordConfirmation( );
-                response = 'You have wisely accepted standup bot\'s offer. Glory to standup bot!';
+                stateService.recordConfirmation(nameOnCallback);
+                response = 'You have wisely accepted standup bot\'s offer. You will help run standup the week of '
+                    + stateService.getCurrentStandupDateString()
+                    + '. Glory to standup bot!';
                 break;
             case 1:
                 if (confirmed.includes(nameOnCallback)) {
-                    response = 'You are already confirmed to run standup';
+                    response = 'You are already confirmed to run standup the week of ' + stateService.getCurrentStandupDateString();
                 } else {
                     stateService.recordConfirmation(nameOnCallback);
-                    response = 'You have wisely  accepted standup bot\'s offer. Glory to standup bot!';
-                    response += ' You will be running standup with ' + confirmed.filter(function (col) {
-                        return col !== nameOnCallback;
-                    })[0];
+                    response = 'You have wisely  accepted standup bot\'s offer. You will help run standup the week of '
+                        + stateService.getCurrentStandupDateString()
+                        + '. Glory to standup bot!';
+
+                    if (confirmed.length > 0) {
+                        response += ' You will be running standup with ' + confirmed.filter(function (col) {
+                            return col !== nameOnCallback;
+                        })[0];
+                    }
                 }
                 break;
             case 2:
                 if (confirmed.includes(nameOnCallback)) {
-                    response = 'You are already confirmed to run standup with ' + confirmed.filter(function (col) {
+                    response = 'You are already confirmed to run standup the week of ' +
+                    stateService.getCurrentStandupDateString();
+
+                    var standupPartners = confirmed.filter(function (col) {
                         return col !== nameOnCallback;
                     })[0];
+
+                    if (standupPartners) response += 'You will run the standup with ' + standupPartners;
                 } else {
-                    response = confirmed.join(',') + ' are already confirmed to run standup';
+                    response = confirmed.join(',') + ' are already confirmed to run standup the week of ' + stateService.getCurrentStandupDateString();
                 }
                 break;
             default:
@@ -83,19 +98,19 @@ function respondToInteraction(payload) {
             return su.slackName === nameOnCallback
         })[0];
         standupperService.addConfirmationForStandupper(respondingStandupper);
-        adminService.messageAdmins('[ADMIN]: ' + nameOnCallback + ' has been confirmed to run the upcoming standup.');
+        adminService.messageAdmins('[ADMIN]: ' + nameOnCallback + ' has been confirmed to run standup the week of ' + stateService.getCurrentStandupDateString());
 
         return response;
 
     } else if (payload.actions[0].value === 'no') {
         if (stateService.getRejectedStandupperNames().includes(nameOnCallback)) {
-            return 'You have already rejected this issuance and will be replaced';
+            return 'You have already rejected this standup issuance and will be replaced';
         } else {
             stateService.recordRejection(nameOnCallback);
             adminService.messageAdmins('[ADMIN]: ' + nameOnCallback
-                + ' has rejected their selection for next week\'s standup.');
+                + ' has rejected their selection for running standup the week of ' + stateService.getCurrentStandupDateString());
             replaceStandupper(nameOnCallback);
-            return 'You will be replaced...for running standup this upcoming week.';
+            return 'You will be replaced...for running standup';
         }
     }
 }
@@ -118,11 +133,12 @@ function replaceStandupper(replacedName) {
     }).slice(0, 1);
 
     messagingService.notifyStanduppersOfSelection(replacementStandupper,
-        'Glory to the bot! You have been selected as a replacement to run standup this upcoming week.');
+        'Glory to the bot! You have been selected as a replacement to run standup the week of ' + stateService.getCurrentStandupDateString());
 
     stateService.recordSelection(replacementStandupper[0].slackName);
     standupperService.incrementSelection(replacementStandupper[0]);
-    adminService.messageAdmins('[ADMIN]: ' + replacementStandupper[0].slackName + ' has been selected as a replacement to run next week\'s standup.');
+    adminService.messageAdmins('[ADMIN]: ' + replacementStandupper[0].slackName +
+        ' has been selected as a replacement to run standup the week of ' + stateService.getCurrentStandupDateString());
 }
 
 //useful - move to admin
@@ -150,9 +166,11 @@ function checkCurrentStateAndNotifyAdmin() {
         return rejected.indexOf(s) === -1;
     }).join(', ');
 
-    adminService.messageAdmins('[ADMIN]: Current confirmed: ' + currentConfirmed);
-    adminService.messageAdmins('[ADMIN]: Awaiting response from: ' + awaitingResponse);
-    adminService.messageAdmins('[ADMIN]: Current rejected: ' + rejected);
+    var adminPrefix = '[ADMIN][' + stateService.getCurrentStandupDateString() + '] ';
+
+    adminService.messageAdmins(adminPrefix + 'Current confirmed: ' + currentConfirmed);
+    adminService.messageAdmins(adminPrefix + 'Awaiting response from: ' + awaitingResponse);
+    adminService.messageAdmins(adminPrefix + 'Current rejected: ' + rejected);
 }
 
 //still being used herein by replacement flow

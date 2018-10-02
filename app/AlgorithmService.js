@@ -4,7 +4,6 @@ function AlgorithmService() {
             return acc + ele.getProbability();
         }, 0);
 
-        //random # from 1 to totalweight
         var random = Math.floor(Math.random() * totalWeight) + 1;
 
         var selected = false;
