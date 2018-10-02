@@ -17,26 +17,7 @@ var stateService = new StateService(stateSheet);
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
 
-var rawStateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('state');
-var currentStateRowRange = rawStateSheet.getRange(rawStateSheet.getLastRow(), 1, 1, 6);
-var currentStateRowData = currentStateRowRange.getValues()[0];
-
 var standuppers = standupperService.getStanduppers();
-
-// function constTest() {
-//   (function(){
-//     const TEST1 = 3;
-//     const asdfghjl = 4;
-//
-//     const a = function() {
-//       Logger.log('a' + TEST1 + asdfghjl);
-//     };
-//
-//     a();
-//
-//
-//   })();
-// }
 
 function runSelectionApp() {
     var selectedStanduppers = selectionService.pickStanduppers();
@@ -65,42 +46,38 @@ function respondToInteraction(payload) {
 
     if (payload.actions[0].value === 'yes') {
 
-        var confirmedCols = currentStateRowData.slice(1, 3).filter(function (c) {
-            return c !== 'not-confirmed'
-        });
+        var confirmed = stateService.getConfirmedStandupperNames();
         var response = '';
 
-        switch (confirmedCols.length) {
+        switch (confirmed.length) {
             case 0:
-                currentStateRowData[1] = nameOnCallback;
+                stateService.recordConfirmation( );
                 response = 'You have wisely accepted standup bot\'s offer. Glory to standup bot!';
                 break;
             case 1:
-                if (confirmedCols.includes(nameOnCallback)) {
+                if (confirmed.includes(nameOnCallback)) {
                     response = 'You are already confirmed to run standup';
                 } else {
-                    currentStateRowData[2] = nameOnCallback;
-                    response = 'You have wisely accepted standup bot\'s offer. Glory to standup bot!';
-                    response += ' You will be running standup with ' + confirmedCols.filter(function (col) {
+                    stateService.recordConfirmation(nameOnCallback);
+                    response = 'You have wisely  accepted standup bot\'s offer. Glory to standup bot!';
+                    response += ' You will be running standup with ' + confirmed.filter(function (col) {
                         return col !== nameOnCallback;
                     })[0];
                 }
                 break;
             case 2:
-                if (confirmedCols.includes(nameOnCallback)) {
-                    response = 'You are already confirmed to run standup with ' + confirmedCols.filter(function (col) {
+                if (confirmed.includes(nameOnCallback)) {
+                    response = 'You are already confirmed to run standup with ' + confirmed.filter(function (col) {
                         return col !== nameOnCallback;
                     })[0];
                 } else {
-                    response = confirmedCols.join(',') + ' are already confirmed to run standup';
+                    response = confirmed.join(',') + ' are already confirmed to run standup';
                 }
                 break;
             default:
                 response = 'Error.';
                 break;
         }
-
-        currentStateRowRange.setValues([currentStateRowData]);
 
         var respondingStandupper = standuppers.filter(function (su) {
             return su.slackName === nameOnCallback
@@ -111,28 +88,25 @@ function respondToInteraction(payload) {
         return response;
 
     } else if (payload.actions[0].value === 'no') {
-        if (currentStateRowData[4].split(', ').includes(nameOnCallback)) {
+        if (stateService.getRejectedStandupperNames().includes(nameOnCallback)) {
             return 'You have already rejected this issuance and will be replaced';
         } else {
-            rejectAndReplace(nameOnCallback);
+            stateService.recordRejection(nameOnCallback);
+            adminService.messageAdmins('[ADMIN]: ' + nameOnCallback
+                + ' has rejected their selection for next week\'s standup.');
+            replaceStandupper(nameOnCallback);
             return 'You will be replaced...for running standup this upcoming week.';
         }
     }
 }
 
-function rejectAndReplace(nameOnCallback) {
-    currentStateRowData[4] = currentStateRowData[4] === '' ? nameOnCallback : currentStateRowData[4] + ', ' + nameOnCallback;
-    currentStateRowRange.setValues([currentStateRowData]);
-    adminService.messageAdmins('[ADMIN]: ' + nameOnCallback
-        + ' has rejected their selection for next week\'s standup.');
-    replaceStandupper(nameOnCallback);
-}
-
 function replaceStandupper(replacedName) {
-    var rejected = currentStateRowData[4].split(', ');
-    var alreadySelected = currentStateRowData[3].split(', ');
+    var rejected = stateService.getRejectedStandupperNames();
+    var alreadySelected = stateService.getSelectedStandupperNames();
     var newSelections = [];
 
+    //replacement
+    //rewrite this
     while (newSelections.filter(function (e) {
         return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName);
     }).length < 1) {
@@ -146,9 +120,7 @@ function replaceStandupper(replacedName) {
     messagingService.notifyStanduppersOfSelection(replacementStandupper,
         'Glory to the bot! You have been selected as a replacement to run standup this upcoming week.');
 
-    //write new selection to list of ppl we've selected
-    currentStateRowData[3] += ", " + replacementStandupper[0].slackName;
-    currentStateRowRange.setValues([currentStateRowData]);
+    stateService.recordSelection(replacementStandupper[0].slackName);
     standupperService.incrementSelection(replacementStandupper[0]);
     adminService.messageAdmins('[ADMIN]: ' + replacementStandupper[0].slackName + ' has been selected as a replacement to run next week\'s standup.');
 }

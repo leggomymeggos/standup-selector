@@ -1,5 +1,3 @@
-var NUM_STANDUPPERS = 2;
-
 function SelectionService(standupperService, algorithmService) {
     this.standupperService = standupperService;
     this.algorithmService = algorithmService;
@@ -11,12 +9,12 @@ function SelectionService(standupperService, algorithmService) {
             .sort(randomize);
 
         randomizedStanduppers.forEach(function (su) {
-            if (su.isForceSelected() && selected.filter(onlyUnique).length < NUM_STANDUPPERS) {
+            if (su.isForceSelected() && selected.filter(onlyUnique).length < 2) {
                 selected.push(su);
             }
         });
 
-        while (selected.filter(onlyUnique).length < NUM_STANDUPPERS) {
+        while (selected.filter(onlyUnique).length < 2) {
             var nextSelected = this.algorithmService
                 .selectRandomlyByWeight(randomizedStanduppers);
 
