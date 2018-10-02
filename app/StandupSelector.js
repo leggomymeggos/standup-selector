@@ -39,12 +39,12 @@ function runSelectionApp() {
 
     messagingService.notifyStanduppersOfSelection(
         selectedStanduppers,
-        'You have been selected to run standup for the week of' + stateService.getCurrentStandupDateString()
+        'You have been selected to run standup for the week of ' + stateService.getCurrentStandupDateString()
     );
 
     var msg = selectedStanduppers.map(function (e) {
         return e.slackName
-    }).join(' and ') + ' have been selected to run standup the week of' + stateService.getCurrentStandupDateString();
+    }).join(' and ') + ' have been selected to run standup the week of ' + stateService.getCurrentStandupDateString();
     adminService.messageAdmins(msg);
 
     selectedStanduppers.forEach(standupperService.incrementSelection);
