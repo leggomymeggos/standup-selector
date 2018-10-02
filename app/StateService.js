@@ -41,7 +41,8 @@ function StateService(stateSheet) {
     };
 
     this.getCurrentStandupDateString = function () {
-        return this.stateSheet.getDataValues()[0][0].toLocaleDateString();
+        var current = this.stateSheet.getDataValues()[0][0];
+        return current === '' ? current : current.toLocaleDateString();
     };
 
     this.recordRejection = function (standupperName) {

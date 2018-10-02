@@ -91,6 +91,16 @@ describe('StateService', () => {
         expect(actual).toEqual('1/1/1000');
     });
 
+    it('getCurrentStandupDateString handles empty column one values', () => {
+        stateSheetSpy.getDataValues.and.returnValue([
+            ['', 'not-confirmed', 'not-confirmed', 'name1, name2', '', 2]
+        ]);
+
+        const actual = subject.getCurrentStandupDateString();
+
+        expect(actual).toEqual('');
+    });
+
     describe('recordConfirmation', () => {
         it('writes name to column two when nobody is confirmed', () => {
             stateSheetSpy.getDataValues.and.returnValue([
