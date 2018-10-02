@@ -19,6 +19,19 @@ var selectionService = new SelectionService(standupperService, algorithmService)
 
 var standuppers = standupperService.getStanduppers();
 
+function swapToTestEnvironment() {
+    appProperties.setProperty('STATE_SHEET_NAME', 'test-state');
+    appProperties.setProperty('ADMIN_SHEET_NAME', 'test-admin');
+    appProperties.setProperty('STANDUPPER_SHEET_NAME', 'test-standuppers');
+}
+
+function swapToProdEnvironment() {
+    appProperties.setProperty('STATE_SHEET_NAME', 'state');
+    appProperties.setProperty('ADMIN_SHEET_NAME', 'admin');
+    appProperties.setProperty('STANDUPPER_SHEET_NAME', 'standuppers');
+}
+
+
 function runSelectionApp() {
     var selectedStanduppers = selectionService.pickStanduppers();
 
