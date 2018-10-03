@@ -1,6 +1,6 @@
 SelectionService = require('../../app/SelectionService');
 AlgorithmService = require('../../app/AlgorithmService');
-onlyUnique = require('../../app/Utilities');
+onlyUnique = require('../../app/Utilities').onlyUnique;
 
 describe('SelectionService', () => {
     let subject;

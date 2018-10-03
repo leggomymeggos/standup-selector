@@ -5,14 +5,16 @@ var adminSheet = sheetFactory.getAdminSheet();
 var stateSheet = sheetFactory.getStateSheet();
 var standupperSheet = sheetFactory.getStandupperSheet();
 
-var slackClient = new SlackClient();
+var stateService = new StateService(stateSheet);
+var attachmentBuilder = new AttachmentBuilder(stateService);
+
+var slackClient = new SlackClient(attachmentBuilder);
 var identificationService = new IdentificationService(slackClient);
 var channelService = new ChannelService(identificationService, slackClient);
 var messagingService = new MessagingService(channelService, slackClient);
 
 var adminService = new AdminService(messagingService, adminSheet);
 var standupperService = new StandupperService(standupperSheet);
-var stateService = new StateService(stateSheet);
 
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
