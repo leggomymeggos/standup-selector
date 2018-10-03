@@ -31,7 +31,12 @@ function StandupperService(standupperSheet) {
                 return su.slackName;
             });
 
-    }
+    };
+
+    //TODO
+    this.saveStandupper = function () {
+
+    };
 }
 
 if (typeof module !== 'undefined' && module.exports) {

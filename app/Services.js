@@ -1,22 +1,29 @@
-function IdentificationService(slackClient) {
-  this.slackClient = slackClient;
-  
-  this.getUserInfo = function(standupper) {
-    var userInfo = this.slackClient.getUserInfo(standupper.email);
-    return userInfo;
-  }.bind(this);
+function UserInfoService(slackClient) {
+    this.slackClient = slackClient;
+
+    this.getUserInfo = function (email) {
+        var userInfo = this.slackClient.getUserInfo(email);
+        return userInfo;
+    };
 }
 
 function ChannelService(identificationService, slackClient) {
-  this.identificationService = identificationService;
-  this.slackClient = slackClient;
-  
-  this.getDmUcid = function(standupper) {
-    var userInfo = this.identificationService.getUserInfo(standupper)
-    var uuid = userInfo.user.id;
-    
-    var openImResponse = this.slackClient.openIm(uuid);
-    standupper.slackDmUcid = openImResponse.channel.id;
-    return openImResponse.channel.id;
-  }.bind(this);
+    this.identificationService = identificationService;
+    this.slackClient = slackClient;
+
+    this.getDmUcid = function (email) {
+        var userInfo = this.identificationService.getUserInfo(email)
+        var uuid = userInfo.user.id;
+
+        var openImResponse = this.slackClient.openIm(uuid);
+        standupper.slackDmUcid = openImResponse.channel.id;
+        return openImResponse.channel.id;
+    };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        UserInfoService: UserInfoService,
+        ChannelService: ChannelService
+    }
 }

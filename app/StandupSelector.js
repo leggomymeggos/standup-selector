@@ -9,12 +9,12 @@ var stateService = new StateService(stateSheet);
 var attachmentBuilder = new AttachmentBuilder(stateService);
 
 var slackClient = new SlackClient(attachmentBuilder);
-var identificationService = new IdentificationService(slackClient);
+var identificationService = new IdentificationApp(slackClient);
 var channelService = new ChannelService(identificationService, slackClient);
 var messagingService = new MessagingService(channelService, slackClient);
 
-var adminService = new AdminService(messagingService, adminSheet);
 var standupperService = new StandupperService(standupperSheet);
+var adminService = new AdminService(messagingService, standupperService, adminSheet);
 
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
@@ -156,38 +156,6 @@ function replaceStandupper(replacedName) {
     standupperService.incrementSelection(replacementStandupper[0]);
     adminService.messageAdmins('[ADMIN]: ' + replacementStandupper[0].slackName +
         ' has been selected as a replacement to run standup the week of ' + stateService.getCurrentStandupDateString());
-}
-
-//TODO - move to admin
-function identifyStanduppers() {
-    var newStandupperData = [];
-    standuppers.forEach(function (su, index) {
-        var userInfo = identificationService.getUserInfo(su);
-        Logger.log('Identifying: ' + su.slackName);
-        su.slackName = userInfo.user ? userInfo.user.name : (userInfo.error + '[' + su.email + ']');
-        newStandupperData.push(su.toDataArray());
-    });
-
-    standupperSheet.setDataValues(newStandupperData);
-}
-
-//TODO - move to admin
-function checkCurrentStateAndNotifyAdmin() {
-    var currentStateRow = stateSheet.getDataValues()[0];
-
-    var currentConfirmed = currentStateRow.slice(1, 3).join(', ');
-    var selected = currentStateRow[3].split(',');
-    var rejected = currentStateRow[4].split(',');
-
-    var awaitingResponse = selected.filter(function (s) {
-        return rejected.indexOf(s) === -1;
-    }).join(', ');
-
-    var adminPrefix = '[ADMIN][' + stateService.getCurrentStandupDateString() + '] ';
-
-    adminService.messageAdmins(adminPrefix + 'Current confirmed: ' + currentConfirmed);
-    adminService.messageAdmins(adminPrefix + 'Awaiting response from: ' + awaitingResponse);
-    adminService.messageAdmins(adminPrefix + 'Current rejected: ' + rejected);
 }
 
 //TODO - still being used herein by replacement flow
