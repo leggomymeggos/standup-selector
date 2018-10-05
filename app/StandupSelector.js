@@ -14,7 +14,7 @@ var channelService = new ChannelService(identificationService, slackClient);
 var messagingService = new MessagingService(channelService, slackClient);
 
 var standupperService = new StandupperService(standupperSheet);
-var adminService = new AdminService(messagingService, standupperService, adminSheet);
+var adminService = new AdminService(messagingService, adminSheet, stateService);
 
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
