@@ -1,7 +1,6 @@
 SlackClient = require('../../app/SlackClient');
 mergeObjs = require('../../app/Utilities').mergeObjs;
 
-
 describe('SlackClient', () => {
     let subject;
     let gPropertiesSpy, attachmentBuilderSpy;
@@ -16,9 +15,9 @@ describe('SlackClient', () => {
         );
 
         gPropertiesSpy = jasmine.createSpyObj('appProperties',
-            ['getValue']
+            ['getProperty']
         );
-        gPropertiesSpy.getValue.and.returnValue('TOKEN');
+        gPropertiesSpy.getProperty.and.returnValue('TOKEN');
 
         subject = new SlackClient(gPropertiesSpy, attachmentBuilderSpy);
     });

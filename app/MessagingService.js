@@ -6,14 +6,14 @@ function MessagingService(channelService, slackClient) {
         standuppers.forEach(function(e) { this.notifyOfSelection(e, msg) }.bind(this));
     };
 
-    this.notify = function(standupper, msg) {
-        var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper);
+    this.sendMessage = function(standupper, msg) {
+        var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper.email);
 
         this.slackClient.writeToChannel(msg, slackDmUcid);
     };
 
     this.notifyOfSelection = function(standupper, msg) {
-        var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper);
+        var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper.email);
 
         this.slackClient.writeToChannelWithSelectionAttachment(msg, slackDmUcid, standupper.slackName);
     };

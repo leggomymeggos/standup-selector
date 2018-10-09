@@ -7,16 +7,15 @@ function UserInfoService(slackClient) {
     };
 }
 
-function ChannelService(identificationService, slackClient) {
-    this.identificationService = identificationService;
+function ChannelService(userInfoService, slackClient) {
+    this.userInfoService = userInfoService;
     this.slackClient = slackClient;
 
     this.getDmUcid = function (email) {
-        var userInfo = this.identificationService.getUserInfo(email)
+        var userInfo = this.userInfoService.getUserInfo(email);
         var uuid = userInfo.user.id;
 
         var openImResponse = this.slackClient.openIm(uuid);
-        standupper.slackDmUcid = openImResponse.channel.id;
         return openImResponse.channel.id;
     };
 }

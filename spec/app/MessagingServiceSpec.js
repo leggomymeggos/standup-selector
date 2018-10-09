@@ -20,7 +20,7 @@ describe('MessagingService', () => {
     });
 
     describe('notifyStanduppersOfSelection', () => {
-        it('should use the slackClient to notify each standupper', () => {
+        it('should use the slackClient to sendMessage each standupper', () => {
             let su1 = {slackName: 'name1', slackDmUcid: '123'};
             let su2 = {slackName: 'name2', slackDmUcid: '456'};
             let su3 = {slackName: 'name3', slackDmUcid: '789'};
@@ -39,13 +39,13 @@ describe('MessagingService', () => {
 
     });
 
-    describe('notify', () => {
+    describe('sendMessage', () => {
         it('should use the slackClient to write to the correct channel', () => {
             let standupper = {
                 slackDmUcid: '12345'
             };
 
-            subject.notify(standupper, 'msg');
+            subject.sendMessage(standupper, 'msg');
 
             expect(slackClientSpy.writeToChannel).toHaveBeenCalledWith('msg', '12345');
         });
@@ -68,14 +68,15 @@ describe('MessagingService', () => {
             it('should use the channelService to retrieve one', () => {
                 let standupper = {
                     slackName: 'name',
-                    slackDmUcid: undefined
+                    slackDmUcid: undefined,
+                    email: 'email@email.com'
                 };
 
                 channelServiceSpy.getDmUcid.and.returnValue('12345');
 
                 subject.notifyOfSelection(standupper, 'msg');
 
-                expect(channelServiceSpy.getDmUcid).toHaveBeenCalledWith(standupper);
+                expect(channelServiceSpy.getDmUcid).toHaveBeenCalledWith(standupper.email);
                 expect(slackClientSpy.writeToChannelWithSelectionAttachment)
                     .toHaveBeenCalledWith('msg', '12345', 'name');
             });

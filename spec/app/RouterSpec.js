@@ -1,13 +1,15 @@
 doPost = require('../../app/Router');
 
 describe('Router', () => {
+    let goodToken = 'GOOD-TOKEN';
+
     beforeEach(() => {
         appProperties = jasmine.createSpyObj('appProperties',
-            ['getValue'],
+            ['getProperty'],
         );
 
-        appProperties.getValue.and.returnValue(
-            'GOOD-TOKEN'
+        appProperties.getProperty.and.returnValue(
+            goodToken
         );
 
         respondToInteraction = jasmine.createSpy('respondToInteraction');
@@ -15,13 +17,10 @@ describe('Router', () => {
     });
 
     describe('doPost', () => {
-        let request, expectedOutput, goodPayload;
+        let inboundRequest, expectedOutput, goodPayload;
 
         beforeEach(() => {
-            goodPayload = {token: 'GOOD-TOKEN'};
-
-            request = {parameter: {payload: JSON.stringify(goodPayload)}};
-
+            inboundRequest = {parameter: {}};
 
             ContentService = jasmine.createSpyObj('contentService',
                 ['createTextOutput'],
@@ -39,13 +38,19 @@ describe('Router', () => {
         });
 
         describe('when interactive button payload', () => {
+            beforeEach(() => {
+                goodPayload = {token: goodToken, type: 'interactive_message'};
+
+                inboundRequest.parameter = {payload: JSON.stringify(goodPayload)};
+            });
+
             it('calls respondToInteraction when token is valid and responds with result', () => {
                 const responseMessage = 'responseMessage';
                 respondToInteraction.and.returnValue(
                     responseMessage
                 );
 
-                const response = doPost(request);
+                const response = doPost(inboundRequest);
 
                 expect(ContentService.createTextOutput)
                     .toHaveBeenCalledWith(JSON.stringify({'text': responseMessage}));
@@ -55,45 +60,67 @@ describe('Router', () => {
                 expect(respondToInteraction).toHaveBeenCalledWith(goodPayload);
                 expect(response).toEqual(expectedOutput);
             });
+
+            it('returns an error payload when token is bad', () => {
+                inboundRequest.parameter.payload = JSON.stringify(
+                    {
+                        token: 'BAD-TOKEN'
+                    }
+                );
+
+                const response = doPost(inboundRequest);
+
+                expect(ContentService.createTextOutput)
+                    .toHaveBeenCalledWith(JSON.stringify({'error': true}));
+                expect(expectedOutput.setMimeType).toHaveBeenCalledWith(
+                    'expectedContentType'
+                );
+                expect(response).toEqual(expectedOutput);
+            });
         });
 
-        xdescribe('when slash command payload', () => {
+        describe('when slash command payload', () => {
+            beforeEach(() => {
+                inboundRequest.parameter = {
+                    token: goodToken,
+                    command: 'command',
+                    text: 'text following slash command'
+                }
+            });
+
             it('calls serviceAdminRequest when token is valid and responds with result', () => {
                 const responseMessage = 'responseMessage';
                 serviceAdminRequest.and.returnValue(
                     responseMessage
                 );
 
-                const response = doPost(request);
+                const response = doPost(inboundRequest);
 
                 expect(ContentService.createTextOutput)
                     .toHaveBeenCalledWith(JSON.stringify({'text': responseMessage}));
                 expect(expectedOutput.setMimeType).toHaveBeenCalledWith(
                     'expectedContentType'
                 );
-                expect(serviceAdminRequest).toHaveBeenCalledWith(goodPayload);
+                expect(serviceAdminRequest).toHaveBeenCalledWith(inboundRequest.parameter);
+                expect(response).toEqual(expectedOutput);
+            });
+
+            it('returns an error payload when token is bad', () => {
+                inboundRequest.parameter.token = 'BAD-TOKEN';
+
+                const response = doPost(inboundRequest);
+
+                expect(ContentService.createTextOutput)
+                    .toHaveBeenCalledWith(JSON.stringify({'error': true}));
+                expect(expectedOutput.setMimeType).toHaveBeenCalledWith(
+                    'expectedContentType'
+                );
                 expect(response).toEqual(expectedOutput);
             });
         });
-
-        it('returns an error payload when token is bad', () => {
-            request.parameter.payload = JSON.stringify(
-                {
-                    token: 'BAD-TOKEN'
-                }
-            );
-
-            const response = doPost(request);
-
-            expect(ContentService.createTextOutput)
-                .toHaveBeenCalledWith(JSON.stringify({'error': true}));
-            expect(expectedOutput.setMimeType).toHaveBeenCalledWith(
-                'expectedContentType'
-            );
-            expect(response).toEqual(expectedOutput);
-        });
     });
 });
+
 
 function TestResponse() {
     this.setMimeType = jasmine.createSpy('setMimeType');

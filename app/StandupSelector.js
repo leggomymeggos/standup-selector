@@ -8,9 +8,10 @@ var standupperSheet = sheetFactory.getStandupperSheet();
 var stateService = new StateService(stateSheet);
 var attachmentBuilder = new AttachmentBuilder(stateService);
 
-var slackClient = new SlackClient(attachmentBuilder);
-var identificationService = new IdentificationApp(slackClient);
-var channelService = new ChannelService(identificationService, slackClient);
+var slackClient = new SlackClient(appProperties, attachmentBuilder);
+var userInfoService = new UserInfoService(slackClient);
+var identificationApp = new IdentificationApp(slackClient, userInfoService);
+var channelService = new ChannelService(userInfoService, slackClient);
 var messagingService = new MessagingService(channelService, slackClient);
 
 var standupperService = new StandupperService(standupperSheet);

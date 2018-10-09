@@ -10,7 +10,7 @@ function AdminService(messagingService, adminSheet, stateService) {
     this.messageAdmins = function (msg) {
         var self = this;
         this.admins.forEach(function (a) {
-            self.messagingService.notify(a, msg);
+            self.messagingService.sendMessage(a, msg);
         });
     };
 

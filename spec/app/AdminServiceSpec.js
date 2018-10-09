@@ -7,7 +7,7 @@ describe('AdminService', () => {
 
     beforeEach(() => {
         messagingServiceSpy = jasmine.createSpyObj('notifcation',
-            ['notify']
+            ['sendMessage']
         );
 
         adminSheetSpy = jasmine.createSpyObj('adminSheet',
@@ -35,8 +35,8 @@ describe('AdminService', () => {
     it('messageAdmins the expected admins with the correct message', () => {
         subject.messageAdmins('msg');
 
-        expect(messagingServiceSpy.notify.calls.count()).toEqual(3);
-        expect(messagingServiceSpy.notify.calls.allArgs())
+        expect(messagingServiceSpy.sendMessage.calls.count()).toEqual(3);
+        expect(messagingServiceSpy.sendMessage.calls.allArgs())
             .toEqual([
                 [new Admin(['email1']), 'msg'],
                 [new Admin(['email2']), 'msg'],
@@ -67,7 +67,7 @@ describe('AdminService', () => {
             subject.sendAdminUpdate();
             const expectedMessage = '[ADMIN][1/1/1000] Current confirmed: confirmed1, confirmed2';
 
-            expect(messagingServiceSpy.notify.calls.allArgs())
+            expect(messagingServiceSpy.sendMessage.calls.allArgs())
                 .toEqual(jasmine.arrayContaining([
                     [new Admin(['email1']), expectedMessage],
                     [new Admin(['email2']), expectedMessage],
@@ -79,7 +79,7 @@ describe('AdminService', () => {
             subject.sendAdminUpdate();
             const expectedMessage = '[ADMIN][1/1/1000] Current rejected: rejected1, rejected2';
 
-            expect(messagingServiceSpy.notify.calls.allArgs())
+            expect(messagingServiceSpy.sendMessage.calls.allArgs())
                 .toEqual(jasmine.arrayContaining([
                     [new Admin(['email1']), expectedMessage],
                     [new Admin(['email2']), expectedMessage],
@@ -91,7 +91,7 @@ describe('AdminService', () => {
             subject.sendAdminUpdate();
             const expectedMessage = '[ADMIN][1/1/1000] Awaiting Response From: selected1, selected2';
 
-            expect(messagingServiceSpy.notify.calls.allArgs())
+            expect(messagingServiceSpy.sendMessage.calls.allArgs())
                 .toEqual(jasmine.arrayContaining([
                     [new Admin(['email1']), expectedMessage],
                     [new Admin(['email2']), expectedMessage],
@@ -102,7 +102,7 @@ describe('AdminService', () => {
         it('sends the correct number of total messages', () => {
             subject.sendAdminUpdate();
 
-            expect(messagingServiceSpy.notify.calls.count()).toEqual(9);
+            expect(messagingServiceSpy.sendMessage.calls.count()).toEqual(9);
         });
     });
 });

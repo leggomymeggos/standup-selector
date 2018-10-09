@@ -48,7 +48,7 @@ function SlackClient(appProperties, attachmentBuilder) {
 
     this.postSlackJson = function (body, target) {
         var payload = JSON.stringify(body);
-        var token = 'Bearer ' + this.appProperties.getValue('SLACK_API_TOKEN');
+        var token = 'Bearer ' + this.appProperties.getProperty('SLACK_API_TOKEN');
 
         var opts = {
             'method': 'post',
@@ -62,7 +62,7 @@ function SlackClient(appProperties, attachmentBuilder) {
     };
 
     this.postSlackFormUrlEncoded = function (payload, target) {
-        var tokenData = {'token': this.appProperties.getValue('SLACK_API_TOKEN')};
+        var tokenData = {'token': this.appProperties.getProperty('SLACK_API_TOKEN')};
         var formData = mergeObjs(payload, tokenData);
         var opts = mergeObjs({
             'method': 'post',
