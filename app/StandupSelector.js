@@ -10,9 +10,12 @@ var attachmentBuilder = new AttachmentBuilder(stateService);
 
 var slackClient = new SlackClient(appProperties, attachmentBuilder);
 var userInfoService = new UserInfoService(slackClient);
-var identificationApp = new IdentificationApp(slackClient, userInfoService);
 var channelService = new ChannelService(userInfoService, slackClient);
 var messagingService = new MessagingService(channelService, slackClient);
+
+var identificationApp = new IdentificationApp(slackClient, userInfoService);
+var commandParser = new CommandParser();
+var slashCommandApp = new SlashCommandApp(commandParser, stateService);
 
 var standupperService = new StandupperService(standupperSheet);
 var adminService = new AdminService(messagingService, adminSheet, stateService);
@@ -129,6 +132,34 @@ function respondToInteraction(payload) {
             return 'You will be replaced...for running standup';
         }
     }
+}
+
+
+function serviceAdminRequest(params) {
+    var msg = 'Error: ';
+
+    if (params.command === '/ssbot') {
+        var parsed = commandParser.parse(params.text);
+
+        if (parsed) {
+            switch (parsed.action) {
+                case x:
+                    //
+                    break;
+                case y:
+                    //
+                    break;
+                default:
+                //
+            }
+        } else {
+            msg += 'Failed to parse command text.'
+        }
+    } else {
+        msg += 'Invalid command.';
+    }
+
+    return msg;
 }
 
 function replaceStandupper(replacedName) {

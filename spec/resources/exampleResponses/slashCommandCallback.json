@@ -9,7 +9,7 @@
     "team_id": "team_id",
     "text": "text",
     "channel_id": "channel_id",
-    "command": "command",
+    "command": "/ssbot",
     "token": "token",
     "response_url": "response_url"
   },
