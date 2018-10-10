@@ -3,6 +3,8 @@ doPost = require('../../app/Router');
 describe('Router', () => {
     let goodToken = 'GOOD-TOKEN';
 
+    let slashCommandAppSpy;
+
     beforeEach(() => {
         appProperties = jasmine.createSpyObj('appProperties',
             ['getProperty'],
@@ -13,7 +15,11 @@ describe('Router', () => {
         );
 
         respondToInteraction = jasmine.createSpy('respondToInteraction');
-        serviceAdminRequest = jasmine.createSpy('serviceAdminRequest');
+        slashCommandAppSpy = jasmine.createSpyObj('slashCommandApp',
+            ['serviceAdminRequest'],
+        );
+
+        slashCommandApp = slashCommandAppSpy;
     });
 
     describe('doPost', () => {
@@ -90,7 +96,7 @@ describe('Router', () => {
 
             it('calls serviceAdminRequest when token is valid and responds with result', () => {
                 const responseMessage = 'responseMessage';
-                serviceAdminRequest.and.returnValue(
+                slashCommandAppSpy.serviceAdminRequest.and.returnValue(
                     responseMessage
                 );
 
@@ -101,7 +107,7 @@ describe('Router', () => {
                 expect(expectedOutput.setMimeType).toHaveBeenCalledWith(
                     'expectedContentType'
                 );
-                expect(serviceAdminRequest).toHaveBeenCalledWith(inboundRequest.parameter);
+                expect(slashCommandAppSpy.serviceAdminRequest).toHaveBeenCalledWith(inboundRequest.parameter);
                 expect(response).toEqual(expectedOutput);
             });
 

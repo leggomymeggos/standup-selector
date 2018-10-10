@@ -24,7 +24,7 @@ function doPost(e) {
             output.setMimeType(ContentService.MimeType.JSON);
             return output;
         } else {
-            var newMessage = serviceAdminRequest(params);
+            var newMessage = slashCommandApp.serviceAdminRequest(params);
 
             var output = ContentService.createTextOutput(JSON.stringify({'text': newMessage}));
             output.setMimeType(ContentService.MimeType.JSON);

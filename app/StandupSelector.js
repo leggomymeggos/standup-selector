@@ -13,12 +13,12 @@ var userInfoService = new UserInfoService(slackClient);
 var channelService = new ChannelService(userInfoService, slackClient);
 var messagingService = new MessagingService(channelService, slackClient);
 
-var identificationApp = new IdentificationApp(slackClient, userInfoService);
-var commandParser = new CommandParser();
-var slashCommandApp = new SlashCommandApp(commandParser, stateService);
-
 var standupperService = new StandupperService(standupperSheet);
 var adminService = new AdminService(messagingService, adminSheet, stateService);
+
+var identificationApp = new IdentificationApp(slackClient, userInfoService);
+var commandParser = new CommandParser();
+var slashCommandApp = new SlashCommandApp(commandParser, stateService, adminService);
 
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
