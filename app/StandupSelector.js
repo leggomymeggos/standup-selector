@@ -134,34 +134,6 @@ function respondToInteraction(payload) {
     }
 }
 
-
-function serviceAdminRequest(params) {
-    var msg = 'Error: ';
-
-    if (params.command === '/ssbot') {
-        var parsed = commandParser.parse(params.text);
-
-        if (parsed) {
-            switch (parsed.action) {
-                case x:
-                    //
-                    break;
-                case y:
-                    //
-                    break;
-                default:
-                //
-            }
-        } else {
-            msg += 'Failed to parse command text.'
-        }
-    } else {
-        msg += 'Invalid command.';
-    }
-
-    return msg;
-}
-
 function replaceStandupper(replacedName) {
     var rejected = stateService.getRejectedStandupperNames();
     var alreadySelected = stateService.getSelectedStandupperNames();

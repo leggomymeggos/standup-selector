@@ -3,7 +3,7 @@ SlashCommandApp = require('../../app/SlashCommandApp');
 describe('SlashCommandApp', () => {
     let subject;
 
-    let commandParserSpy, stateServiceSpy;
+    let commandParserSpy, stateServiceSpy, adminServiceSpy;
 
     beforeEach(() => {
         commandParserSpy = jasmine.createSpyObj('commandParser',
@@ -14,121 +14,153 @@ describe('SlashCommandApp', () => {
             [
                 'getSelectedStandupperNames',
                 'getCurrentStandupDateString',
-                'getRejectedStandupperNames'
+                'getRejectedStandupperNames',
+                'recordRejection'
             ],
         );
 
-        subject = new SlashCommandApp(commandParserSpy, stateServiceSpy)
+        adminServiceSpy = jasmine.createSpyObj('adminService',
+            ['checkIfAdmin'],
+        );
+        adminServiceSpy.checkIfAdmin.and.returnValue(true);
+
+        subject = new SlashCommandApp(commandParserSpy, stateServiceSpy, adminServiceSpy)
     });
 
     describe('serviceAdminRequest', () => {
-        it('returns invalid command error message if command is not ssbot', () => {
+        it('returns not an admin error message if requesting user is not admin', () => {
+            adminServiceSpy.checkIfAdmin.and.returnValue(false);
             const result = subject.serviceAdminRequest({
-                command: '/notssbot'
+                command: '/notssbot',
+                user_name: 'not-admin'
             });
 
-            expect(result).toEqual('Error: Invalid command.');
+            expect(adminServiceSpy.checkIfAdmin).toHaveBeenCalledWith('not-admin');
+            expect(result).toEqual('Error: You need to be an admin to use this command.');
         });
 
-        it('returns an parse failure error if text is not parseable', () => {
-            commandParserSpy.parse.and.returnValue(false);
+        describe('when requester is an admin', () => {
 
-            const result = subject.serviceAdminRequest({
-                command: '/ssbot',
-                text: 'not-correct'
+            it('returns invalid command error message if command is not ssbot', () => {
+                const result = subject.serviceAdminRequest({
+                    command: '/notssbot'
+                });
+
+                expect(result).toEqual('Error: Invalid command.');
             });
 
-            expect(commandParserSpy.parse).toHaveBeenCalledWith(
-                'not-correct'
-            );
-            expect(result).toEqual('Error: Failed to parse command text.');
-        });
+            it('returns an parse failure error if text is not parseable', () => {
+                commandParserSpy.parse.and.returnValue(false);
 
-        it('returns an invalid action error if action is unknown', () => {
-            commandParserSpy.parse.and.returnValue({
-                action: 'unknown'
-            });
+                const result = subject.serviceAdminRequest({
+                    command: '/ssbot',
+                    text: 'not-correct'
+                });
 
-            const result = subject.serviceAdminRequest({
-                command: '/ssbot',
-                text: 'unknown name1, name2'
-            });
-
-            expect(commandParserSpy.parse).toHaveBeenCalledWith(
-                'unknown name1, name2'
-            );
-            expect(result).toEqual('Error: Invalid action.');
-        });
-
-        describe('forceReject', () => {
-            replaceStandupper = jasmine.createSpy('replaceStandupper');
-
-            beforeEach(() => {
-                stateServiceSpy.getSelectedStandupperNames.and.returnValue([
-                    'name1',
-                    'name2'
-                ]);
-
-                stateServiceSpy.getRejectedStandupperNames.and.returnValue(
-                    []
+                expect(commandParserSpy.parse).toHaveBeenCalledWith(
+                    'not-correct'
                 );
-
+                expect(result).toEqual('Error: Failed to parse command text.');
             });
 
-            it('returns an invalid standupper error message any standupper is not selected', () => {
+            it('returns an invalid action error if action is unknown', () => {
                 commandParserSpy.parse.and.returnValue({
-                    action: 'forceReject',
-                    args: ['name1', 'name2', 'name3']
+                    action: 'unknown'
                 });
 
                 const result = subject.serviceAdminRequest({
                     command: '/ssbot',
-                    text: 'forceReject name1 name2 name3'
+                    text: 'unknown name1, name2'
                 });
 
-                expect(stateServiceSpy.getSelectedStandupperNames)
-                    .toHaveBeenCalled();
-                expect(result).toContain('Error: Invalid standupper provided.');
+                expect(commandParserSpy.parse).toHaveBeenCalledWith(
+                    'unknown name1, name2'
+                );
+                expect(result).toEqual('Error: Invalid action.');
             });
 
-            it('returns an invalid standupper error message any standupper is already rejected', () => {
-                stateServiceSpy.getRejectedStandupperNames.and.returnValue(
-                    ['name1']
-                );
+            describe('doing a forceReject', () => {
+                replaceStandupper = jasmine.createSpy('replaceStandupper');
 
-                commandParserSpy.parse.and.returnValue({
-                    action: 'forceReject',
-                    args: ['name1', 'name2']
+                beforeEach(() => {
+                    stateServiceSpy.getSelectedStandupperNames.and.returnValue([
+                        'name1',
+                        'name2'
+                    ]);
+
+                    stateServiceSpy.getRejectedStandupperNames.and.returnValue(
+                        []
+                    );
+
                 });
 
-                const result = subject.serviceAdminRequest({
-                    command: '/ssbot',
-                    text: 'forceReject name1 name2 name3'
+                it('returns an invalid standupper error message any standupper is not selected', () => {
+                    commandParserSpy.parse.and.returnValue({
+                        action: 'forceReject',
+                        args: ['name1', 'name2', 'name3']
+                    });
+
+                    const result = subject.serviceAdminRequest({
+                        command: '/ssbot',
+                        text: 'forceReject name1 name2 name3'
+                    });
+
+                    expect(stateServiceSpy.getSelectedStandupperNames)
+                        .toHaveBeenCalled();
+                    expect(result).toContain('Error: Invalid standupper provided.');
                 });
 
-                expect(stateServiceSpy.getSelectedStandupperNames)
-                    .toHaveBeenCalled();
-                expect(result).toContain('Error: Invalid standupper provided.');
-            });
+                it('returns an invalid standupper error message any standupper is already rejected', () => {
+                    stateServiceSpy.getRejectedStandupperNames.and.returnValue(
+                        ['name1']
+                    );
 
-            it('replacesStandupper and returns a success message ', () => {
-                stateServiceSpy.getCurrentStandupDateString.and.returnValue(
-                    '1/1/1000'
-                );
+                    commandParserSpy.parse.and.returnValue({
+                        action: 'forceReject',
+                        args: ['name1', 'name2']
+                    });
 
-                commandParserSpy.parse.and.returnValue({
-                    action: 'forceReject',
-                    args: ['name1', 'name2']
+                    const result = subject.serviceAdminRequest({
+                        command: '/ssbot',
+                        text: 'forceReject name1 name2 name3'
+                    });
+
+                    expect(stateServiceSpy.getSelectedStandupperNames)
+                        .toHaveBeenCalled();
+                    expect(result).toContain('Error: Invalid standupper provided.');
                 });
 
-                const result = subject.serviceAdminRequest({
-                    command: '/ssbot',
-                    text: 'forceReject name1 name2 name3'
-                });
+                it('replaces and records rejection for each standupper, returns a success message ', () => {
+                    stateServiceSpy.getCurrentStandupDateString.and.returnValue(
+                        '1/1/1000'
+                    );
 
-                expect(stateServiceSpy.getSelectedStandupperNames)
-                    .toHaveBeenCalled();
-                expect(result).toEqual('Force rejecting for 1/1/1000: name1, name2');
+                    commandParserSpy.parse.and.returnValue({
+                        action: 'forceReject',
+                        args: ['name1', 'name2']
+                    });
+
+                    const result = subject.serviceAdminRequest({
+                        command: '/ssbot',
+                        text: 'forceReject name1 name2 name3'
+                    });
+
+                    expect(stateServiceSpy.getSelectedStandupperNames)
+                        .toHaveBeenCalled();
+                    expect(replaceStandupper.calls.allArgs()).toEqual(
+                        [
+                            ['name1'],
+                            ['name2']
+                        ]
+                    );
+                    expect(stateServiceSpy.recordRejection.calls.allArgs()).toEqual(
+                        [
+                            ['name1'],
+                            ['name2']
+                        ]
+                    );
+                    expect(result).toEqual('Force rejecting for 1/1/1000: name1, name2');
+                });
             });
         });
     });

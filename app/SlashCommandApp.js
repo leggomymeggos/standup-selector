@@ -1,9 +1,15 @@
-function SlashCommandApp(commandParser, stateService) {
+function SlashCommandApp(commandParser, stateService, adminService) {
     this.commandParser = commandParser;
     this.stateService = stateService;
+    this.adminService = adminService;
 
     this.serviceAdminRequest = function (params) {
         var msg = 'Error: ';
+
+        if (!this.adminService.checkIfAdmin(params.user_name)) {
+            msg += 'You need to be an admin to use this command.';
+            return msg;
+        }
 
         if (params.command === '/ssbot') {
             var parsed = this.commandParser.parse(params.text);
@@ -22,8 +28,9 @@ function SlashCommandApp(commandParser, stateService) {
                             msg += 'Invalid standupper provided. ' +
                                 'Check to make sure they are currently selected and not already rejected.';
                         } else {
-                            parsed.args.forEach(function (standupper) {
-                                replaceStandupper(standupper);
+                            parsed.args.forEach(function (name) {
+                                stateService.recordRejection(name);
+                                replaceStandupper(name);
                             });
                             msg = 'Force rejecting for ';
                             msg += stateService.getCurrentStandupDateString() + ': ';

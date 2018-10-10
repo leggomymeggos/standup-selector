@@ -7,6 +7,10 @@ function AdminService(messagingService, adminSheet, stateService) {
         return new Admin(row)
     });
 
+    this.checkIfAdmin = function (name) {
+        return this.admins.includes(name);
+    };
+
     this.messageAdmins = function (msg) {
         var self = this;
         this.admins.forEach(function (a) {
