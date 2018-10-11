@@ -8,7 +8,9 @@ function AdminService(messagingService, adminSheet, stateService) {
     });
 
     this.checkIfAdmin = function (name) {
-        return this.admins.includes(name);
+        return this.admins
+            .map(function (a) { return a.slackName; })
+            .includes(name);
     };
 
     this.messageAdmins = function (msg) {

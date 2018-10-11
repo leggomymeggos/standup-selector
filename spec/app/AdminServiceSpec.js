@@ -32,6 +32,19 @@ describe('AdminService', () => {
         subject = new AdminService(messagingServiceSpy, adminSheetSpy, stateServiceSpy);
     });
 
+    describe('checkIfAdmin', () => {
+        it('returns whether the provided email is an admin', () => {
+            subject.admins = [
+                {slackName: 'admin1'},
+                {slackName: 'admin2'},
+                {slackName: 'admin3'}
+            ];
+
+            expect(subject.checkIfAdmin('admin1')).toEqual(true);
+            expect(subject.checkIfAdmin('admin4')).toEqual(false);
+        });
+    });
+
     it('messageAdmins the expected admins with the correct message', () => {
         subject.messageAdmins('msg');
 
