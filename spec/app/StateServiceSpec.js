@@ -7,7 +7,13 @@ describe('StateService', () => {
 
     beforeEach(() => {
         stateSheetSpy = jasmine.createSpyObj('stateSheet',
-            ['getDataValues', 'addNewRow', 'getLastRowNum', 'setDataValues']
+            [
+                'getDataValues',
+                'addNewRow',
+                'getLastRowNum',
+                'setDataValues',
+                'getLatestState'
+            ]
         );
 
         fakeNextMonday = new Date(new Date('1/1/1000'));
@@ -40,7 +46,7 @@ describe('StateService', () => {
         ]);
     });
 
-    it('getConfirmedStandupperNames returns current confirmed names', () => {
+    it('getConfirmedStandupperNames returns current confirmed names and updates state sheet', () => {
         stateSheetSpy.getDataValues.and.returnValue([
             [new Date('1/1/1000'), 'not-confirmed', 'not-confirmed', '', '', 2]
         ]);
@@ -59,19 +65,21 @@ describe('StateService', () => {
         ]);
         actual = subject.getConfirmedStandupperNames();
         expect(actual).toEqual(['person1', 'person2']);
+        expect(stateSheetSpy.getLatestState).toHaveBeenCalled();
     });
 
-    it('getRejectedStandupperNames returns column five', () => {
+    it('getRejectedStandupperNames returns column five and updates state sheet', () => {
         stateSheetSpy.getDataValues.and.returnValue([
             [new Date('1/1/1000'), 'not-confirmed', 'not-confirmed', '', 'name1, name2', 2]
         ]);
 
-        const actual = subject.getRejectedStandupperNames()
+        const actual = subject.getRejectedStandupperNames();
 
         expect(actual).toEqual(['name1', 'name2']);
+        expect(stateSheetSpy.getLatestState).toHaveBeenCalled();
     });
 
-    it('getSelectedStandupperNames returns column four', () => {
+    it('getSelectedStandupperNames returns column four and updates state sheet', () => {
         stateSheetSpy.getDataValues.and.returnValue([
             [new Date('1/1/1000'), 'not-confirmed', 'not-confirmed', 'name1, name2', '', 2]
         ]);
@@ -79,9 +87,10 @@ describe('StateService', () => {
         const actual = subject.getSelectedStandupperNames();
 
         expect(actual).toEqual(['name1', 'name2']);
+        expect(stateSheetSpy.getLatestState).toHaveBeenCalled();
     });
 
-    it('getCurrentStandupDateString returns column one', () => {
+    it('getCurrentStandupDateString returns column one and updates state sheet', () => {
         stateSheetSpy.getDataValues.and.returnValue([
             [new Date('1/1/1000'), 'not-confirmed', 'not-confirmed', 'name1, name2', '', 2]
         ]);
@@ -89,6 +98,7 @@ describe('StateService', () => {
         const actual = subject.getCurrentStandupDateString();
 
         expect(actual).toEqual('1/1/1000');
+        expect(stateSheetSpy.getLatestState).toHaveBeenCalled();
     });
 
     it('getCurrentStandupDateString handles empty column one values', () => {
@@ -99,6 +109,7 @@ describe('StateService', () => {
         const actual = subject.getCurrentStandupDateString();
 
         expect(actual).toEqual('');
+        expect(stateSheetSpy.getLatestState).toHaveBeenCalled();
     });
 
     describe('recordConfirmation', () => {

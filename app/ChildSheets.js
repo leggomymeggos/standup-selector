@@ -17,7 +17,12 @@ function StateSheet(sheet) {
 
     this.getLatestIssuanceId = function () {
         return sheet.getLastRow() - 1;
-    }
+    };
+
+    this.getLatestState = function () {
+        this.sheet.rangeRowStart =
+            this.sheet.getLastRow() === 1 ? 2 : this.sheet.getLastRow()
+    };
 }
 
 function StandupperSheet(sheet) {

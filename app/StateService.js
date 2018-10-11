@@ -24,6 +24,7 @@ function StateService(stateSheet) {
     };
 
     this.getConfirmedStandupperNames = function () {
+        this.stateSheet.getLatestState();
         return this.stateSheet.getDataValues()[0]
             .slice(1, 3)
             .filter(function (e) {
@@ -32,15 +33,18 @@ function StateService(stateSheet) {
     };
 
     this.getRejectedStandupperNames = function () {
+        this.stateSheet.getLatestState();
         return this.stateSheet.getDataValues()[0][4].split(', ');
 
     };
 
     this.getSelectedStandupperNames = function () {
+        this.stateSheet.getLatestState();
         return this.stateSheet.getDataValues()[0][3].split(', ');
     };
 
     this.getCurrentStandupDateString = function () {
+        this.stateSheet.getLatestState();
         var current = this.stateSheet.getDataValues()[0][0];
         return current === '' ? current : current.toLocaleDateString();
     };

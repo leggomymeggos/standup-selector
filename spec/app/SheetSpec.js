@@ -124,5 +124,11 @@ describe("SheetSpec", () => {
         it('getLatestIssuanceId', () => {
             expect(stateSheet.getLatestIssuanceId()).toEqual(currentStateRow - 1)
         });
+
+        it('getLatestState updates underlying sheet starting row', () => {
+            gSheetSpy.getLastRow.and.returnValue(5);
+            stateSheet.getLatestState();
+            expect(gSheetSpy.rangeRowStart).toEqual(5);
+        });
     });
 });

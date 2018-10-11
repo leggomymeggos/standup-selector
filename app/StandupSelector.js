@@ -56,6 +56,28 @@ function runSelectionApp() {
     selectedStanduppers.forEach(standupperService.incrementSelection);
 }
 
+function sendAdminUpdate() {
+    return adminService.sendAdminUpdate();
+}
+
+function dmStanduppersAsBot() {
+    stateService.getConfirmedStandupperNames().forEach(function (name) {
+        messagingService.sendMessage(name, 'Just kidding...?')
+    });
+}
+
+function stateServiceRaceConditionTest() {
+    Logger.log(stateService.stateSheet.getLastRowNum());
+    Logger.log('-------');
+    Logger.log(stateService.stateSheet.sheet.getLastRow());
+    stateService.createNewStandup([{slackName: 'name1'}, {slackName: 'name2'}]);
+    // Utilities.sleep(5 * 1000);
+    Logger.log('++++++');
+    Logger.log(stateService.stateSheet.getLastRowNum());
+    Logger.log('-------');
+    Logger.log(stateService.stateSheet.sheet.getLastRow());
+}
+
 function respondToInteraction(payload) {
     console.log('PAYLOAD: ' + JSON.stringify(payload));
     var issuanceId = payload.callback_id.match(/\d+$/);

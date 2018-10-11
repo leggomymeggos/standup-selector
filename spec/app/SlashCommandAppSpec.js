@@ -7,7 +7,7 @@ describe('SlashCommandApp', () => {
 
     beforeEach(() => {
         commandParserSpy = jasmine.createSpyObj('commandParser',
-            ['parse'],
+            ['parseCommand'],
         );
 
         stateServiceSpy = jasmine.createSpyObj('stateService',
@@ -50,21 +50,21 @@ describe('SlashCommandApp', () => {
             });
 
             it('returns an parse failure error if text is not parseable', () => {
-                commandParserSpy.parse.and.returnValue(false);
+                commandParserSpy.parseCommand.and.returnValue(false);
 
                 const result = subject.serviceAdminRequest({
                     command: '/ssbot',
                     text: 'not-correct'
                 });
 
-                expect(commandParserSpy.parse).toHaveBeenCalledWith(
+                expect(commandParserSpy.parseCommand).toHaveBeenCalledWith(
                     'not-correct'
                 );
                 expect(result).toEqual('Error: Failed to parse command text.');
             });
 
             it('returns an invalid action error if action is unknown', () => {
-                commandParserSpy.parse.and.returnValue({
+                commandParserSpy.parseCommand.and.returnValue({
                     action: 'unknown'
                 });
 
@@ -73,7 +73,7 @@ describe('SlashCommandApp', () => {
                     text: 'unknown name1, name2'
                 });
 
-                expect(commandParserSpy.parse).toHaveBeenCalledWith(
+                expect(commandParserSpy.parseCommand).toHaveBeenCalledWith(
                     'unknown name1, name2'
                 );
                 expect(result).toEqual('Error: Invalid action.');
@@ -95,7 +95,7 @@ describe('SlashCommandApp', () => {
                 });
 
                 it('returns an invalid standupper error message any standupper is not selected', () => {
-                    commandParserSpy.parse.and.returnValue({
+                    commandParserSpy.parseCommand.and.returnValue({
                         action: 'forceReject',
                         args: ['name1', 'name2', 'name3']
                     });
@@ -115,7 +115,7 @@ describe('SlashCommandApp', () => {
                         ['name1']
                     );
 
-                    commandParserSpy.parse.and.returnValue({
+                    commandParserSpy.parseCommand.and.returnValue({
                         action: 'forceReject',
                         args: ['name1', 'name2']
                     });
@@ -135,7 +135,7 @@ describe('SlashCommandApp', () => {
                         '1/1/1000'
                     );
 
-                    commandParserSpy.parse.and.returnValue({
+                    commandParserSpy.parseCommand.and.returnValue({
                         action: 'forceReject',
                         args: ['name1', 'name2']
                     });
