@@ -35,9 +35,9 @@ describe('AdminService', () => {
     describe('checkIfAdmin', () => {
         it('returns whether the provided email is an admin', () => {
             subject.admins = [
-                {slackName: 'admin1'},
-                {slackName: 'admin2'},
-                {slackName: 'admin3'}
+                new Admin(['admin1@email.com', 'admin1']),
+                new Admin(['admin2@email.com', 'admin2']),
+                new Admin(['admin3@email.com', 'admin3'])
             ];
 
             expect(subject.checkIfAdmin('admin1')).toEqual(true);
