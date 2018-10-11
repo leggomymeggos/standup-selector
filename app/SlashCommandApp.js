@@ -12,7 +12,7 @@ function SlashCommandApp(commandParser, stateService, adminService) {
         }
 
         if (params.command === '/ssbot') {
-            var parsed = this.commandParser.parse(params.text);
+            var parsed = this.commandParser.parseCommand(params.text);
 
             if (parsed) {
                 switch (parsed.action) {
