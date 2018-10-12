@@ -6,19 +6,29 @@ function Sheet(sheet, rangeRowStart, rangeColStart, rangeRowLength, rangeColLeng
     this.rangeColLength = rangeColLength;
 
     this.getDataValues = function () {
-        return sheet.getRange(rangeRowStart, rangeColStart, rangeRowLength, rangeColLength).getValues();
+        return this.sheet.getRange(
+            this.rangeRowStart,
+            this.rangeColStart,
+            this.rangeRowLength,
+            this.rangeColLength
+        ).getValues();
     };
 
     this.setDataValues = function (data) {
-        sheet.getRange(rangeRowStart, rangeColStart, rangeRowLength, rangeColLength).setValues(data);
+        this.sheet.getRange(
+            this.rangeRowStart,
+            this.rangeColStart,
+            this.rangeRowLength,
+            this.rangeColLength
+        ).setValues(data);
     };
 
     this.getLastRowNum = function () {
-        return sheet.getLastRow();
+        return this.sheet.getLastRow();
     };
 
     this.addNewRow = function (dataArray) {
-        sheet.appendRow(dataArray);
+        this.sheet.appendRow(dataArray);
     };
 }
 
