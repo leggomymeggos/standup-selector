@@ -20,7 +20,7 @@ function StateSheet(sheet) {
     };
 
     this.getLatestState = function () {
-        this.sheet.rangeRowStart =
+        this.rangeRowStart =
             this.sheet.getLastRow() === 1 ? 2 : this.sheet.getLastRow()
     };
 }

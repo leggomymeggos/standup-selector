@@ -128,7 +128,7 @@ describe("SheetSpec", () => {
         it('getLatestState updates underlying sheet starting row', () => {
             gSheetSpy.getLastRow.and.returnValue(5);
             stateSheet.getLatestState();
-            expect(gSheetSpy.rangeRowStart).toEqual(5);
+            expect(stateSheet.rangeRowStart).toEqual(5);
         });
     });
 });
