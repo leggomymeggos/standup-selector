@@ -64,7 +64,7 @@ describe('SlashCommandApp', () => {
                 expect(commandParserSpy.parseCommand).toHaveBeenCalledWith(
                     'not-correct'
                 );
-                expect(result).toEqual({'text': 'Error: Invalid action. Enter `/seabotgo help` to see a list of available actions.'});
+                expect(result).toEqual({'text': 'Error: Unable to parse action. Enter `/seabotgo help` to see a list of available actions.'});
             });
 
             it('returns an invalid action error if action is unknown', () => {

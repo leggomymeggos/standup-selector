@@ -14,9 +14,12 @@ function SlashCommandApp(commandParser, stateService, adminService, attachmentSe
         }
 
         if (params.command === '/seabotgo') {
+            console.log('Parsing seabotgo command');
             var parsed = this.commandParser.parseCommand(params.text);
 
+
             if (parsed) {
+                console.log('Command successfully parsed');
                 switch (parsed.action) {
                     case 'forceReject':
                         var validStanduppers =
@@ -47,7 +50,7 @@ function SlashCommandApp(commandParser, stateService, adminService, attachmentSe
                         msg += 'Invalid action. Enter `/seabotgo help` to see a list of available actions.'
                 }
             } else {
-                msg += 'Invalid action. Enter `/seabotgo help` to see a list of available actions.'
+                msg += 'Unable to parse action. Enter `/seabotgo help` to see a list of available actions.'
             }
         } else {
             msg += 'Invalid command.';
