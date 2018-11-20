@@ -2,7 +2,7 @@
 function doPost(e) {
     var params = e.parameter;
 
-    //interactive button response
+    //request for an interactive button response
     if (params.payload) {
         var payload = JSON.parse(params.payload);
         var providedToken = payload.token;
@@ -18,15 +18,16 @@ function doPost(e) {
             output.setMimeType(ContentService.MimeType.JSON);
             return output;
         }
+    //admin request or unknown
     } else {
         if (params.token !== appProperties.getProperty('SLACK_CALLBACK_TOKEN')) {
             var output = ContentService.createTextOutput(JSON.stringify({'error': true}));
             output.setMimeType(ContentService.MimeType.JSON);
             return output;
         } else {
-            var newMessage = slashCommandApp.serviceAdminRequest(params);
+            var response = slashCommandApp.serviceAdminRequest(params);
 
-            var output = ContentService.createTextOutput(JSON.stringify({'text': newMessage}));
+            var output = ContentService.createTextOutput(JSON.stringify(response));
             output.setMimeType(ContentService.MimeType.JSON);
             return output;
         }

@@ -3,7 +3,7 @@ SlashCommandApp = require('../../app/SlashCommandApp');
 describe('SlashCommandApp', () => {
     let subject;
 
-    let commandParserSpy, stateServiceSpy, adminServiceSpy;
+    let commandParserSpy, stateServiceSpy, adminServiceSpy, attachmentBuilderSpy;
 
     beforeEach(() => {
         commandParserSpy = jasmine.createSpyObj('commandParser',
@@ -24,14 +24,18 @@ describe('SlashCommandApp', () => {
         );
         adminServiceSpy.checkIfAdmin.and.returnValue(true);
 
-        subject = new SlashCommandApp(commandParserSpy, stateServiceSpy, adminServiceSpy)
+        attachmentBuilderSpy = jasmine.createSpyObj('attachmentBuilder',
+            ['buildHelpCommmands'],
+        );
+
+        subject = new SlashCommandApp(commandParserSpy, stateServiceSpy, adminServiceSpy, attachmentBuilderSpy)
     });
 
     describe('serviceAdminRequest', () => {
         it('returns not an admin error message if requesting user is not admin', () => {
             adminServiceSpy.checkIfAdmin.and.returnValue(false);
             const result = subject.serviceAdminRequest({
-                command: '/notssbot',
+                command: '/notseabotgo',
                 user_name: 'not-admin'
             });
 
@@ -41,26 +45,26 @@ describe('SlashCommandApp', () => {
 
         describe('when requester is an admin', () => {
 
-            it('returns invalid command error message if command is not ssbot', () => {
+            it('returns invalid command error message if command is not seabotgo', () => {
                 const result = subject.serviceAdminRequest({
-                    command: '/notssbot'
+                    command: '/notseabotgo'
                 });
 
-                expect(result).toEqual('Error: Invalid command.');
+                expect(result).toEqual({'text': 'Error: Invalid command.'});
             });
 
-            it('returns an parse failure error if text is not parseable', () => {
+            it('returns an invalid action message if text is not parseable', () => {
                 commandParserSpy.parseCommand.and.returnValue(false);
 
                 const result = subject.serviceAdminRequest({
-                    command: '/ssbot',
+                    command: '/seabotgo',
                     text: 'not-correct'
                 });
 
                 expect(commandParserSpy.parseCommand).toHaveBeenCalledWith(
                     'not-correct'
                 );
-                expect(result).toEqual('Error: Failed to parse command text.');
+                expect(result).toEqual({'text': 'Error: Invalid action. Enter `/seabotgo help` to see a list of available actions.'});
             });
 
             it('returns an invalid action error if action is unknown', () => {
@@ -69,14 +73,14 @@ describe('SlashCommandApp', () => {
                 });
 
                 const result = subject.serviceAdminRequest({
-                    command: '/ssbot',
+                    command: '/seabotgo',
                     text: 'unknown name1, name2'
                 });
 
                 expect(commandParserSpy.parseCommand).toHaveBeenCalledWith(
                     'unknown name1, name2'
                 );
-                expect(result).toEqual('Error: Invalid action.');
+                expect(result).toEqual({'text': 'Error: Invalid action. Enter `/seabotgo help` to see a list of available actions.'});
             });
 
             describe('doing a forceReject', () => {
@@ -91,7 +95,6 @@ describe('SlashCommandApp', () => {
                     stateServiceSpy.getRejectedStandupperNames.and.returnValue(
                         []
                     );
-
                 });
 
                 it('returns an invalid standupper error message any standupper is not selected', () => {
@@ -101,13 +104,13 @@ describe('SlashCommandApp', () => {
                     });
 
                     const result = subject.serviceAdminRequest({
-                        command: '/ssbot',
+                        command: '/seabotgo',
                         text: 'forceReject name1 name2 name3'
                     });
 
                     expect(stateServiceSpy.getSelectedStandupperNames)
                         .toHaveBeenCalled();
-                    expect(result).toContain('Error: Invalid standupper provided.');
+                    expect(result.text).toContain('Error: Invalid standupper provided.');
                 });
 
                 it('returns an invalid standupper error message any standupper is already rejected', () => {
@@ -121,13 +124,13 @@ describe('SlashCommandApp', () => {
                     });
 
                     const result = subject.serviceAdminRequest({
-                        command: '/ssbot',
+                        command: '/seabotgo',
                         text: 'forceReject name1 name2 name3'
                     });
 
                     expect(stateServiceSpy.getSelectedStandupperNames)
                         .toHaveBeenCalled();
-                    expect(result).toContain('Error: Invalid standupper provided.');
+                    expect(result.text).toContain('Error: Invalid standupper provided.');
                 });
 
                 it('replaces and records rejection for each standupper, returns a success message ', () => {
@@ -141,7 +144,7 @@ describe('SlashCommandApp', () => {
                     });
 
                     const result = subject.serviceAdminRequest({
-                        command: '/ssbot',
+                        command: '/seabotgo',
                         text: 'forceReject name1 name2 name3'
                     });
 
@@ -159,8 +162,39 @@ describe('SlashCommandApp', () => {
                             ['name2']
                         ]
                     );
-                    expect(result).toEqual('Force rejecting for 1/1/1000: name1, name2');
+                    expect(result).toEqual({'text': 'Force rejecting for 1/1/1000: name1, name2'});
                 });
+            });
+
+            describe('doing a help command', () => {
+                let expectedAttachments;
+
+                beforeEach(() => {
+                    expectedAttachments = [{
+                        'title': 'some title',
+                        'text': 'some text'
+                    }];
+                    attachmentBuilderSpy.buildHelpCommmands.and.returnValue(expectedAttachments)
+                });
+
+                it('returns a message detailing a list of possible commands', () => {
+                    commandParserSpy.parseCommand.and.returnValue({
+                        action: 'help',
+                        args: []
+                    });
+
+                    const result = subject.serviceAdminRequest({
+                        command: '/seabotgo',
+                        text: 'help'
+                    });
+
+                    expect(result).toEqual({
+                        'text': 'Available actions: ',
+                        'attachments': expectedAttachments
+                    });
+
+                });
+
             });
         });
     });

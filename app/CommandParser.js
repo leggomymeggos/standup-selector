@@ -4,9 +4,14 @@ function CommandParser() {
         var commandRegex = /(\w+)\s+(.*$)/;
         var parsed = commandText.match(commandRegex);
 
-        if (parsed && parsed[1] && parsed[2]) {
+        if (parsed && parsed[1]) {
             var action = parsed[1]; //should be command action
-            var args = parsed[2].split(/,?\s+/); //should be comma separated args
+            var args = [];
+
+            //should be comma separated args
+            if (parsed[2]) {
+                args = parsed[2].split(/,?\s+/);
+            }
 
             return {
                 action: action,

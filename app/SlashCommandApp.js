@@ -1,17 +1,19 @@
-function SlashCommandApp(commandParser, stateService, adminService) {
+function SlashCommandApp(commandParser, stateService, adminService, attachmentService) {
     this.commandParser = commandParser;
     this.stateService = stateService;
     this.adminService = adminService;
+    this.attachmentBuilder = attachmentService;
 
     this.serviceAdminRequest = function (params) {
         var msg = 'Error: ';
+        var response = {};
 
         if (!this.adminService.checkIfAdmin(params.user_name)) {
             msg += 'You need to be an admin to use this command.';
             return msg;
         }
 
-        if (params.command === '/ssbot') {
+        if (params.command === '/seabotgo') {
             var parsed = this.commandParser.parseCommand(params.text);
 
             if (parsed) {
@@ -37,17 +39,23 @@ function SlashCommandApp(commandParser, stateService, adminService) {
                             msg += parsed.args.join(', ');
                         }
                         break;
+                    case 'help':
+                        msg = "Available actions: ";
+                        response.attachments = this.attachmentBuilder.buildHelpCommmands();
+                        break;
                     default:
-                        msg += 'Invalid action.'
+                        msg += 'Invalid action. Enter `/seabotgo help` to see a list of available actions.'
                 }
             } else {
-                msg += 'Failed to parse command text.'
+                msg += 'Invalid action. Enter `/seabotgo help` to see a list of available actions.'
             }
         } else {
             msg += 'Invalid command.';
         }
 
-        return msg;
+        response.text = msg;
+
+        return response;
     };
 }
 

@@ -38,6 +38,19 @@ function AttachmentBuilder(stateService) {
             }
         ]
     };
+
+    this.buildHelpCommmands = function () {
+        return [
+            {
+                "title": "help",
+                "text": "/seabotgo help"
+            },
+            {
+                "title": "forceReject",
+                "text": "/seabotgo forceReject [standupperName1, standupperName2, ...]"
+            }
+        ];
+    };
 }
 
 if (typeof module !== 'undefined' && module.exports) {

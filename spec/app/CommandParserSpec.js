@@ -42,8 +42,8 @@ describe('CommandParser', () => {
                     .toEqual(false);
             });
 
-            it('returns false when two groups from the command are not captured', () => {
-                expect(subject.parseCommand('action'))
+            it('returns false when an action is not captureable', () => {
+                expect(subject.parseCommand(''))
                     .toEqual(false);
             });
         });

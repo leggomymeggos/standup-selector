@@ -95,15 +95,15 @@ describe('Router', () => {
             });
 
             it('calls serviceAdminRequest when token is valid and responds with result', () => {
-                const responseMessage = 'responseMessage';
+                const responseObject = {'text':'responseMessage'};
                 slashCommandAppSpy.serviceAdminRequest.and.returnValue(
-                    responseMessage
+                    responseObject
                 );
 
                 const response = doPost(inboundRequest);
 
                 expect(ContentService.createTextOutput)
-                    .toHaveBeenCalledWith(JSON.stringify({'text': responseMessage}));
+                    .toHaveBeenCalledWith(JSON.stringify(responseObject));
                 expect(expectedOutput.setMimeType).toHaveBeenCalledWith(
                     'expectedContentType'
                 );

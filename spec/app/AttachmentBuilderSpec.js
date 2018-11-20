@@ -63,8 +63,17 @@ describe('AttachmentBuilder', () => {
                 'callback_id': 'name_100'
             }));
         });
-
     });
 
+    describe('buildHelpCommands', () => {
+        it('provides a correct constructed attachment for help commands', () => {
+            const result = subject.buildHelpCommmands();
+
+            expect(result.length).toEqual(2);
+            expect(result[0]).toEqual(jasmine.objectContaining({
+
+            }));
+        });
+    });
 });
 
