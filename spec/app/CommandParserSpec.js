@@ -36,6 +36,15 @@ describe('CommandParser', () => {
                 });
         });
 
+        it('handles commands with no arguments', () => {
+            const result = subject.parseCommand('help');
+
+            expect(result).toEqual({
+                action: 'help',
+                args: []
+            })
+        });
+
         describe('error handling', () => {
             it('returns false when command does not match', () => {
                 expect(subject.parseCommand('123456'))

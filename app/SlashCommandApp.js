@@ -17,7 +17,6 @@ function SlashCommandApp(commandParser, stateService, adminService, attachmentSe
             console.log('Parsing seabotgo command');
             var parsed = this.commandParser.parseCommand(params.text);
 
-
             if (parsed) {
                 console.log('Command successfully parsed');
                 switch (parsed.action) {
