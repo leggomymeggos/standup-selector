@@ -60,6 +60,11 @@ function sendAdminUpdate() {
     return adminService.sendAdminUpdate();
 }
 
+function testGregEmail() {
+    var result = channelService.getDmUcid('gchattinmcnichols@pivotal.io');
+    Logger.log(result)
+}
+
 function respondToInteraction(payload) {
     console.log('PAYLOAD: ' + JSON.stringify(payload));
     var issuanceId = payload.callback_id.match(/\d+$/);
