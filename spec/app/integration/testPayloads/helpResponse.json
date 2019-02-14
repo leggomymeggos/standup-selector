@@ -1,0 +1,13 @@
+{
+  "attachments": [
+    {
+      "title": "help",
+      "text": "/seabotgo help"
+    },
+    {
+      "title": "forceReject",
+      "text": "/seabotgo forceReject [standupperName1, standupperName2, ...]"
+    }
+  ],
+  "text": "Available actions: "
+}

@@ -5,10 +5,7 @@ TestUtil = require('./TestEnvironmentUtil');
 describe('SlashCommandApp Integration Test', () => {
     let stateGSheet, adminGSheet, standupperGSheet;
 
-    let slashCommandCallback;
     beforeEach(() => {
-        slashCommandCallback = JSON.parse(fs.readFileSync('spec/app/integration/testPayloads/help.json', 'utf8'));
-
         let setup = new TestUtil.TestEnvBuilder();
 
         //email::slackName
@@ -52,8 +49,10 @@ describe('SlashCommandApp Integration Test', () => {
 
     describe('a help command is sent', () => {
         it('should return a help response', () => {
-            const response = HandleRequest(slashCommandCallback);
-            expect(response.payload).toEqual('{"attachments":[{"title":"help","text":"/seabotgo help"},{"title":"forceReject","text":"/seabotgo forceReject [standupperName1, standupperName2, ...]"}],"text":"Available actions: "}');
+            const helpRequest = JSON.parse(fs.readFileSync('spec/app/integration/testPayloads/helpRequest.json', 'utf8'));
+            const response = HandleRequest(helpRequest);
+            const expectedResponse = JSON.parse(fs.readFileSync('spec/app/integration/testPayloads/helpResponse.json', 'utf8'));
+            expect(JSON.parse(response.payload)).toEqual(expectedResponse);
         });
     });
 
