@@ -16,10 +16,11 @@ describe('SlashCommandApp Integration Test', () => {
         ];
         //issuance date::first-confirmed::second-confirmed::selected::rejected
         let stateSheetData = [
-            ['issuance date', 'first-confirmed', 'second-confirmed', 'selected', 'rejected'],
-            ['9/10/2018', 'standupPerson4', 'standupPerson1', 'standupPerson4, standupPerson1, standupPerson2', 'standupPerson2'],
-            ['12/10/2018', 'standupPerson4', 'standupPerson1', 'standupPerson4, standupPerson1, standupPerson2', 'standupPerson2'],
-            ['10/29/2018', 'standupPerson4', 'standupPerson2', 'standupPerson4, standupPerson1, standupPerson2', 'standupPerson1']
+            ['issuance date', 'first-confirmed', 'second-confirmed', 'selected', 'rejected', '1'],
+            [new Date('9/10/2018'), 'standupPerson4', 'standupPerson1', 'standupPerson4, standupPerson1, standupPerson2', 'standupPerson2', '2'],
+            [new Date('12/10/2018'), 'standupPerson4', 'standupPerson1', 'standupPerson4, standupPerson1, standupPerson2', 'standupPerson2', '3'],
+            [new Date('10/29/2018'), 'standupPerson4', 'standupPerson2', 'standupPerson4, standupPerson1, standupPerson2', 'standupPerson1', '4'],
+            [new Date('12/13/2018'), '', '', 'standupPerson1, standupPerson2', '', '5']
         ];
 
         //slackName::email::lastConfirmedDate::numberOfStandupsRun::forceSelect::forceOmit
@@ -49,12 +50,33 @@ describe('SlashCommandApp Integration Test', () => {
 
     describe('a help command is sent', () => {
         it('should return a help response', () => {
-            const helpRequest = JSON.parse(fs.readFileSync('spec/app/integration/testPayloads/helpRequest.json', 'utf8'));
+            const helpRequest = JSON.parse(fs.readFileSync('spec/app/integration/slashCommands/helpRequest.json', 'utf8'));
             const response = HandleRequest(helpRequest);
-            const expectedResponse = JSON.parse(fs.readFileSync('spec/app/integration/testPayloads/helpResponse.json', 'utf8'));
+            const expectedResponse = JSON.parse(fs.readFileSync('spec/app/integration/slashCommands/helpResponse.json', 'utf8'));
             expect(JSON.parse(response.payload)).toEqual(expectedResponse);
         });
     });
 
+    describe('a reject command is sent', () => {
+        it('should reject the person specified', () => {
+            const rejectCallback = JSON.parse(fs.readFileSync('spec/app/integration/slashCommands/rejectRequest.json', 'utf8'));
+            const response = HandleRequest(rejectCallback);
+
+            expect(JSON.parse(response.payload)).toEqual({
+                text: 'Force rejecting for 12/13/2018: standupPerson1'
+            })
+        });
+
+        it('should not reject an inelligible person', () => {
+            const rejectCallback = JSON.parse(fs.readFileSync('spec/app/integration/slashCommands/rejectRequest.json', 'utf8'));
+            rejectCallback.parameter.text = "forceReject does-not-exist";
+
+            const response = HandleRequest(rejectCallback);
+
+            expect(JSON.parse(response.payload)).toEqual({
+                text: 'Error: Invalid standupper provided. Check to make sure they are currently selected and not already rejected.'
+            })
+        });
+    });
 
 });
