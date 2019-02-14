@@ -1,3 +1,4 @@
+var fs = require('fs');
 HandleRequest = require('../../../app/Router');
 TestUtil = require('./TestEnvironmentUtil');
 
@@ -6,67 +7,7 @@ describe('SlashCommandApp Integration Test', () => {
 
     let slashCommandCallback;
     beforeEach(() => {
-        slashCommandCallback =
-            {
-                "parameter": {
-                    "channel_name": "channel_name",
-                    "user_id": "adminId1",
-                    "user_name": "adminPerson1",
-                    "trigger_id": "trigger_id",
-                    "team_domain": "team_domain",
-                    "team_id": "team_id",
-                    "text": "help",
-                    "channel_id": "channel_id",
-                    "command": "/seabotgo",
-                    "token": "token",
-                    "response_url": "response_url"
-                },
-                "contextPath": "",
-                "contentLength": 352,
-                "queryString": "",
-                "parameters": {
-                    "channel_name": [
-                        "directmessage"
-                    ],
-                    "user_id": [
-                        "user_id"
-                    ],
-                    "user_name": [
-                        "rneumann"
-                    ],
-                    "trigger_id": [
-                        "450367592948.2156835366.2ad03aea34a9e58b130eab3a8d547e40"
-                    ],
-                    "team_domain": [
-                        "pivotal"
-                    ],
-                    "team_id": [
-                        "team_id"
-                    ],
-                    "text": [
-                        "textFollowingSlashCommand"
-                    ],
-                    "channel_id": [
-                        "channel_id"
-                    ],
-                    "command": [
-                        "/seabotgo"
-                    ],
-                    "token": [
-                        "TvXmtEXkQ7xUKF6C45tDYXc3"
-                    ],
-                    "response_url": [
-                        "http://www.response_url.com"
-                    ]
-                },
-                "postData": {
-                    "type": "application/x-www-form-urlencoded",
-                    "length": 352,
-                    "contents": "contents",
-                    "name": "postData"
-                }
-            };
-
+        slashCommandCallback = JSON.parse(fs.readFileSync('spec/app/integration/testPayloads/help.json', 'utf8'));
 
         let setup = new TestUtil.TestEnvBuilder();
 
