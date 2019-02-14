@@ -1,26 +1,46 @@
 doPost = require('../../app/Router');
 
-describe('Router', () => {
+xdescribe('Router', () => {
     let goodToken = 'GOOD-TOKEN';
 
-    let slashCommandAppSpy;
+    let slashCommandAppSpy, fakeAppProperties, fakeInitializer;
 
     beforeEach(() => {
-        appProperties = jasmine.createSpyObj('appProperties',
+
+        fakeAppProperties = jasmine.createSpyObj('appProperties',
             ['getProperty'],
         );
 
-        appProperties.getProperty.and.returnValue(
+        fakeAppProperties.getProperty.and.returnValue(
             goodToken
         );
 
+
+        PropertiesService = jasmine.createSpyObj('PropertiesService',
+            ['getScriptProperties'],
+        );
+
+        PropertiesService.getScriptProperties.and.returnValue(
+            fakeAppProperties
+        );
+
         respondToInteraction = jasmine.createSpy('respondToInteraction');
-        slashCommandAppSpy = jasmine.createSpyObj('slashCommandApp',
+        slashCommandAppSpy = jasmine.createSpyObj('slashCommandApp2',
             ['serviceAdminRequest'],
         );
 
-        slashCommandApp = slashCommandAppSpy;
+
+        fakeInitializer = new FakeInitializer();
+        fakeInitializer.newSlashCommandApp.and.returnValue(slashCommandAppSpy);
+
+        Initializer = function () {
+            return fakeInitializer;
+        };
     });
+
+    function FakeInitializer() {
+        this.newSlashCommandApp = jasmine.createSpy("newSlashCommandApp");
+    }
 
     describe('doPost', () => {
         let inboundRequest, expectedOutput, goodPayload;
@@ -95,7 +115,7 @@ describe('Router', () => {
             });
 
             it('calls serviceAdminRequest when token is valid and responds with result', () => {
-                const responseObject = {'text':'responseMessage'};
+                const responseObject = {'text': 'responseMessage'};
                 slashCommandAppSpy.serviceAdminRequest.and.returnValue(
                     responseObject
                 );

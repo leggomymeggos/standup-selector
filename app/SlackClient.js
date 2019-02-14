@@ -1,15 +1,17 @@
 function SlackClient(appProperties, attachmentBuilder) {
     this.appProperties = appProperties;
     this.attachmentBuilder = attachmentBuilder;
-    const openImUrl = 'https://slack.com/api/im.open';
-    const userInfoByEmailUrl = 'https://slack.com/api/users.lookupByEmail';
+
+    this.openImUrl = this.appProperties.getProperty('SLACK_URL_OPEN_IM');
+    this.userInfoByEmailUrl = this.appProperties.getProperty('SLACK_URL_USER_INFO_BY_EMAIL');
+    this.postMessageUrl = this.appProperties.getProperty('SLACK_URL_POST_MESSAGE');
 
     this.openIm = function (uuid) {
         var body = {
             'user': uuid
         };
 
-        var resp = this.postSlackJson(body, openImUrl);
+        var resp = this.postSlackJson(body, this.openImUrl);
         return JSON.parse(resp.getContentText());
     };
 
@@ -18,7 +20,7 @@ function SlackClient(appProperties, attachmentBuilder) {
             'email': email
         };
 
-        var resp = this.postSlackFormUrlEncoded(body, userInfoByEmailUrl);
+        var resp = this.postSlackFormUrlEncoded(body, this.userInfoByEmailUrl);
         return JSON.parse(resp.getContentText());
     };
 
@@ -40,9 +42,7 @@ function SlackClient(appProperties, attachmentBuilder) {
     };
 
     this.postMessage = function (body) {
-        const slack_post_message_url = 'https://slack.com/api/chat.postMessage';
-
-        var resp = this.postSlackJson(body, slack_post_message_url);
+        var resp = this.postSlackJson(body, this.postMessageUrl);
         return JSON.parse(resp.getContentText());
     };
 
