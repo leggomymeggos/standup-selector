@@ -15,10 +15,11 @@ function FakeGSheet(sheetData) {
     };
 
     this.setValues = function (rangeData) {
-        if (rangeData.length !== this.colLen) {
+        var self = this;
+        if (rangeData.length !== this.rowLen) {
             throw "Invalid data provided for current range";
         } else if (rangeData.filter(function (row) {
-            return row.length !== colLen
+            return row.length !== self.colLen
         }).length > 0) {
             throw "Every row must have as many columns as specified in the range";
             //currently dont ever use a range that doesnt start at the first column
@@ -27,7 +28,6 @@ function FakeGSheet(sheetData) {
         } else {
 
             var currRow = this.rowStart;
-            var self = this;
 
             rangeData.forEach(function (rangeRow) {
                 self.sheetData[currRow++] = rangeRow;
