@@ -1,8 +1,8 @@
-function SlashCommandApp(commandParser, stateService, adminService, attachmentService) {
+function SlashCommandApp(commandParser, stateService, adminService, attachmentBuilder) {
     this.commandParser = commandParser;
     this.stateService = stateService;
     this.adminService = adminService;
-    this.attachmentBuilder = attachmentService;
+    this.attachmentBuilder = attachmentBuilder;
 
     this.serviceAdminRequest = function (params) {
         var msg = 'Error: ';
@@ -14,11 +14,9 @@ function SlashCommandApp(commandParser, stateService, adminService, attachmentSe
         }
 
         if (params.command === '/seabotgo') {
-            console.log('Parsing seabotgo command');
             var parsed = this.commandParser.parseCommand(params.text);
 
             if (parsed) {
-                console.log('Command successfully parsed');
                 switch (parsed.action) {
                     case 'forceReject':
                         var validStanduppers =

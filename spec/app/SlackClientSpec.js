@@ -17,7 +17,9 @@ describe('SlackClient', () => {
         gPropertiesSpy = jasmine.createSpyObj('appProperties',
             ['getProperty']
         );
-        gPropertiesSpy.getProperty.and.returnValue('TOKEN');
+        gPropertiesSpy.getProperty.and.callFake(function (propertyName) {
+            return propertyName;
+        });
 
         subject = new SlackClient(gPropertiesSpy, attachmentBuilderSpy);
     });
@@ -39,13 +41,13 @@ describe('SlackClient', () => {
                 'method': 'post',
                 'contentType': 'application/json',
                 'headers': {
-                    'Authorization': 'Bearer TOKEN'
+                    'Authorization': 'Bearer SLACK_API_TOKEN'
                 },
                 'payload': expectedPayload
             };
 
             expect(UrlFetchApp.fetch).toHaveBeenCalledWith(
-                'https://slack.com/api/im.open',
+                'SLACK_URL_OPEN_IM',
                 expectedOpts
             );
             expect(response).toEqual({ok: true});
@@ -64,7 +66,7 @@ describe('SlackClient', () => {
 
             const expectedPayload = {
                 'email': 'email@email.com',
-                'token': 'TOKEN'
+                'token': 'SLACK_API_TOKEN'
             };
             const expectedOpts = {
                 'method': 'post',
@@ -73,7 +75,7 @@ describe('SlackClient', () => {
             };
 
             expect(UrlFetchApp.fetch).toHaveBeenCalledWith(
-                'https://slack.com/api/users.lookupByEmail',
+                'SLACK_URL_USER_INFO_BY_EMAIL',
                 expectedOpts
             );
             expect(response).toEqual({ok: true});
@@ -98,13 +100,13 @@ describe('SlackClient', () => {
                 'method': 'post',
                 'contentType': 'application/json',
                 'headers': {
-                    'Authorization': 'Bearer TOKEN'
+                    'Authorization': 'Bearer SLACK_API_TOKEN'
                 },
                 'payload': JSON.stringify(expectedPayload)
             };
 
             expect(UrlFetchApp.fetch).toHaveBeenCalledWith(
-                'https://slack.com/api/chat.postMessage',
+                'SLACK_URL_POST_MESSAGE',
                 expectedOpts
             );
 
@@ -131,13 +133,13 @@ describe('SlackClient', () => {
                 'method': 'post',
                 'contentType': 'application/json',
                 'headers': {
-                    'Authorization': 'Bearer TOKEN'
+                    'Authorization': 'Bearer SLACK_API_TOKEN'
                 },
                 'payload': JSON.stringify(expectedPayload)
             };
 
             expect(UrlFetchApp.fetch).toHaveBeenCalledWith(
-                'https://slack.com/api/chat.postMessage',
+                'SLACK_URL_POST_MESSAGE',
                 expectedOpts
             );
 

@@ -3,11 +3,13 @@ function doPost(e) {
     var params = e.parameter;
 
     //request for an interactive button response
+    var gScriptProperties = PropertiesService.getScriptProperties();
+
     if (params.payload) {
         var payload = JSON.parse(params.payload);
         var providedToken = payload.token;
 
-        if (providedToken !== appProperties.getProperty('SLACK_CALLBACK_TOKEN')) {
+        if (providedToken !== gScriptProperties.getProperty('SLACK_CALLBACK_TOKEN')) {
             var output = ContentService.createTextOutput(JSON.stringify({'error': true}));
             output.setMimeType(ContentService.MimeType.JSON);
             return output;
@@ -20,15 +22,18 @@ function doPost(e) {
         }
     //admin request or unknown
     } else {
-        if (params.token !== appProperties.getProperty('SLACK_CALLBACK_TOKEN')) {
+        if (params.token !== gScriptProperties.getProperty('SLACK_CALLBACK_TOKEN')) {
             var output = ContentService.createTextOutput(JSON.stringify({'error': true}));
             output.setMimeType(ContentService.MimeType.JSON);
             return output;
         } else {
-            var response = slashCommandApp.serviceAdminRequest(params);
+            var app = new Initializer(gScriptProperties).newSlashCommandApp();
 
-            var output = ContentService.createTextOutput(JSON.stringify(response));
+            var response = app.serviceAdminRequest(params);
+            var responseJson = JSON.stringify(response);
+            var output = ContentService.createTextOutput(responseJson);
             output.setMimeType(ContentService.MimeType.JSON);
+
             return output;
         }
 
@@ -37,5 +42,10 @@ function doPost(e) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = doPost
+    module.exports = doPost;
+    Initializer = require('./Initializer');
+    //need to explicitly import these for integration tests...
+    //probably because theyre both exported from 'services'?
+    UserInfoService = require('./Services').UserInfoService;
+    ChannelService = require('./Services').ChannelService;
 }
