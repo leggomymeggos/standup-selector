@@ -24,7 +24,11 @@ function SelectionService(standupperService, algorithmService) {
         }
 
         return selected.filter(onlyUnique);
-    }
+    };
+
+    this.replaceStandupper = function (nameToReplace) {
+
+    };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
