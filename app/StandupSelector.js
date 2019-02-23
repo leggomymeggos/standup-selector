@@ -125,7 +125,8 @@ function respondToInteraction(payload) {
 
         return response;
 
-    } else if (payload.actions[0].value === 'no') {
+    }
+    else if (payload.actions[0].value === 'no') {
         if (stateService.getRejectedStandupperNames().includes(nameOnCallback)) {
             return 'You have already rejected this standup issuance and will be replaced';
         } else {
@@ -138,6 +139,7 @@ function respondToInteraction(payload) {
     }
 }
 
+//refactor this to work on test pollution
 function replaceStandupper(replacedName) {
     var rejected = stateService.getRejectedStandupperNames();
     var alreadySelected = stateService.getSelectedStandupperNames();
