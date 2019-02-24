@@ -24,7 +24,7 @@ describe('StandupperService', () => {
     it('addConfirmation writes new date to third column for standupper', () => {
         getNextMonday = () => {return new Date('5/5/5000');};
 
-        subject.addConfirmationForStandupper({ id: 1});
+        subject.addConfirmation('name1');
 
         expect(standupperSheetSpy.setDataValues)
             .toHaveBeenCalledWith([

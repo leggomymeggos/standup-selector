@@ -15,9 +15,13 @@ function StandupperService(standupperSheet) {
         standupperSheet.setDataValues(standupperTable);
     };
 
-    this.addConfirmationForStandupper = function (standupper) {
+    this.addConfirmation = function (standupperName) {
+        var standupperRowIndex = this.getStanduppers()
+            .map(function (su) {return su.slackName})
+            .indexOf(standupperName);
+
         var standupperTable = standupperSheet.getDataValues();
-        var standupperRow = standupperTable[standupper.id - 1];
+        var standupperRow = standupperTable[standupperRowIndex];
         standupperRow[2] = getNextMonday().toLocaleDateString();
         standupperSheet.setDataValues(standupperTable);
     };
