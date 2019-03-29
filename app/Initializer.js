@@ -15,13 +15,22 @@ function Initializer(appProperties) {
     this.newSlashCommandApp = function () {
         this.initializeShared();
         this.commandParser = new CommandParser();
-        return new SlashCommandApp(this.commandParser, this.stateService, this.adminService, this.attachmentBuilder);
+
+        this.initializeSelectionService();
+        return new SlashCommandApp(this.commandParser, this.stateService, this.adminService, this.selectionService, this.attachmentBuilder);
     };
 
     this.newInteractiveButtonApp = function () {
         this.initializeShared();
 
         return new InteractiveButtonApp(this.stateService, this.adminService, this.attachmentBuilder);
+    };
+
+    this.initializeSelectionService = function () {
+        this.standupperSheet = this.sheetFactory.getStandupperSheet();
+        this.standupperService = new StandupperService(this.standupperSheet);
+        this.algorithmService = new AlgorithmService();
+        this.selectionService = new SelectionService(this.standupperService, this.algorithmService);
     };
 
     this.initializeMessaging = function() {

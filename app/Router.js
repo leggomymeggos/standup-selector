@@ -15,6 +15,7 @@ function doPost(e) {
             return output;
         } else {
             var newMessage = respondToInteraction(payload);
+            // var newMessage = new Initializer(gScriptProperties).newInteractiveButtonApp().respondToInteraction(payload);
 
             var output = ContentService.createTextOutput(JSON.stringify({'text': newMessage}));
             output.setMimeType(ContentService.MimeType.JSON);

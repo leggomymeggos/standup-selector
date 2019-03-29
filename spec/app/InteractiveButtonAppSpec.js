@@ -12,7 +12,9 @@ describe('InteractiveButtonApp', () => {
                 'validateCallbackId',
                 'getRejectedStandupperNames',
                 'recordRejection',
-                'getCurrentStandupDateString'
+                'recordConfirmation',
+                'getCurrentStandupDateString',
+                'getConfirmedStandupperNames'
             ],
         );
 
@@ -30,7 +32,7 @@ describe('InteractiveButtonApp', () => {
 
         standupperServiceSpy = jasmine.createSpyObj('standupperService',
             [
-                'addConfirmationForStandupper'
+                'addConfirmation'
             ],
         );
 
@@ -77,27 +79,62 @@ describe('InteractiveButtonApp', () => {
 
             describe('when response is yes', () => {
                 beforeEach(() => {
-                    payload.actions[0].value = 'yes'
+                    payload.actions[0].value = 'yes';
+                    stateServiceSpy.getCurrentStandupDateString.and.returnValue('1/1');
                 });
 
                 it('should send correct response message according to state', () => {
+                    var testCases = [
+                        {
+                            case: '\nwhen no current confirmations',
+                            currentConfirmed: [],
+                            expectedResponse: 'You have wisely accepted Standup bot\'s offer. You will help run standup the week of 1/1. Glory to Standup bot!',
+                            confirmationIsExpected: true,
+                        },
+                        {
+                            case: '\nwhen one previous confirmation',
+                            currentConfirmed: ['person2'],
+                            expectedResponse: 'You have wisely accepted Standup bot\'s offer. You will help run standup the week of 1/1. You will be running Standup with person2. Glory to Standup bot!',
+                            confirmationIsExpected: true,
+                        },
+                        {
+                            case: '\nwhen one previous confirmation, request is redundant',
+                            currentConfirmed: ['person'],
+                            expectedResponse: 'You are already confirmed to run standup the week of 1/1.',
+                            confirmationIsExpected: false,
+                        },
+                        {
+                            case: '\nwhen two previous confirmations, request is redundant',
+                            currentConfirmed: ['person', 'person2'],
+                            expectedResponse: 'You are already confirmed to run standup the week of 1/1.',
+                            confirmationIsExpected: false,
+                        },
+                        {
+                            case: '\nwhen two previous confirmations, request is extraneous/erroneous',
+                            currentConfirmed: ['person2', 'person3'],
+                            expectedResponse: 'There are already two people confirmed to run Standup this upcoming week.',
+                            confirmationIsExpected: false,
+                        },
+                    ];
+
+                    testCases.forEach((testCase) => {
+                        stateServiceSpy.getConfirmedStandupperNames.and.returnValue(testCase.currentConfirmed);
+
+                        var response = subject.respondToInteraction(payload);
+
+                        expect(response).toBe(testCase.expectedResponse, testCase.case);
 
 
+                        if (testCase.confirmationIsExpected) {
+                            expect(stateServiceSpy.recordConfirmation).toHaveBeenCalledWith('person');
+                            expect(standupperServiceSpy.addConfirmation).toHaveBeenCalledWith('person');
+                            expect(adminServiceSpy.messageAdmins).toHaveBeenCalledWith(
+                                '[ADMIN]: person has been confirmed to run standup the week of 1/1'
+                            );
+                        }
+                    })
                 });
 
-                fdescribe('when confirmation is valid', () => {
-                    it('should record the confirmation and message admins', () => {
-                        subject.respondToInteraction(payload);
-
-                        expect(stateServiceSpy.recordConfirmation).toHaveBeenCalledWith('person');
-                        expect(standupperServiceSpy.addConfirmationForStandupper).toHaveBeenCalledWith('person');
-                        expect(adminServiceSpy.messageAdmins).toHaveBeenCalledWith('');
-                    });
-                });
-
-                describe('confirmation is redundant', () => {
-
-                });
             });
             describe('when response is no', () => {
                 beforeEach(() => {
