@@ -1,12 +1,14 @@
-function SlashCommandApp(commandParser, stateService, adminService, attachmentBuilder) {
+function SlashCommandApp(commandParser, stateService, adminService, selectionService, attachmentBuilder) {
     this.commandParser = commandParser;
     this.stateService = stateService;
     this.adminService = adminService;
     this.attachmentBuilder = attachmentBuilder;
+    this.selectionService = selectionService;
 
     this.serviceAdminRequest = function (params) {
         var msg = 'Error: ';
         var response = {};
+        var self = this;
 
         if (!this.adminService.checkIfAdmin(params.user_name)) {
             msg += 'You need to be an admin to use this command.';
@@ -22,20 +24,20 @@ function SlashCommandApp(commandParser, stateService, adminService, attachmentBu
                         var validStanduppers =
                             parsed.args
                                 .every(function (el) {
-                                    return stateService.getSelectedStandupperNames().indexOf(el) >= 0
-                                    && stateService.getRejectedStandupperNames().indexOf(el) < 0
+                                    return self.stateService.getSelectedStandupperNames().indexOf(el) >= 0
+                                    && self.stateService.getRejectedStandupperNames().indexOf(el) < 0
                                 });
 
                         if (!validStanduppers) {
-                            msg += 'Invalid standupper provided. ' +
+                            msg += 'Invalid standupper(s) provided. ' +
                                 'Check to make sure they are currently selected and not already rejected.';
                         } else {
                             parsed.args.forEach(function (name) {
-                                stateService.recordRejection(name);
-                                replaceStandupper(name);
+                                self.stateService.recordRejection(name);
+                                self.selectionService.replaceStandupper(name);
                             });
                             msg = 'Force rejecting for ';
-                            msg += stateService.getCurrentStandupDateString() + ': ';
+                            msg += this.stateService.getCurrentStandupDateString() + ': ';
                             msg += parsed.args.join(', ');
                         }
                         break;

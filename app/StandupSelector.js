@@ -16,9 +16,7 @@ var messagingService = new MessagingService(channelService, slackClient);
 var standupperService = new StandupperService(standupperSheet);
 var adminService = new AdminService(messagingService, adminSheet, stateService);
 
-var identificationApp = new IdentificationApp(slackClient, userInfoService);
 var commandParser = new CommandParser();
-var slashCommandApp = new SlashCommandApp(commandParser, stateService, adminService);
 
 var algorithmService = new AlgorithmService();
 var selectionService = new SelectionService(standupperService, algorithmService);
@@ -87,7 +85,7 @@ function respondToInteraction(payload) {
                     response = 'You are already confirmed to run standup the week of ' + stateService.getCurrentStandupDateString();
                 } else {
                     stateService.recordConfirmation(nameOnCallback);
-                    response = 'You have wisely  accepted standup bot\'s offer. You will help run standup the week of '
+                    response = 'You have wisely accepted standup bot\'s offer. You will help run standup the week of '
                         + stateService.getCurrentStandupDateString()
                         + '. Glory to standup bot!';
 
@@ -117,11 +115,11 @@ function respondToInteraction(payload) {
                 break;
         }
 
-        var respondingStandupper = standuppers.filter(function (su) {
-            return su.slackName === nameOnCallback
-        })[0];
-        standupperService.addConfirmationForStandupper(respondingStandupper);
-        adminService.messageAdmins('[ADMIN]: ' + nameOnCallback + ' has been confirmed to run standup the week of ' + stateService.getCurrentStandupDateString());
+        // var respondingStandupper = standuppers.filter(function (su) {
+        //     return su.slackName === nameOnCallback
+        // })[0];
+        // standupperService.addConfirmation(respondingStandupper);
+        // adminService.messageAdmins('[ADMIN]: ' + nameOnCallback + ' has been confirmed to run standup the week of ' + stateService.getCurrentStandupDateString());
 
         return response;
 

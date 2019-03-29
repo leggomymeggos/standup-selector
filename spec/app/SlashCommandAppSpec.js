@@ -3,7 +3,7 @@ SlashCommandApp = require('../../app/SlashCommandApp');
 describe('SlashCommandApp', () => {
     let subject;
 
-    let commandParserSpy, stateServiceSpy, adminServiceSpy, attachmentBuilderSpy;
+    let commandParserSpy, stateServiceSpy, adminServiceSpy, attachmentBuilderSpy, selectionServiceSpy;
 
     beforeEach(() => {
         commandParserSpy = jasmine.createSpyObj('commandParser',
@@ -19,6 +19,10 @@ describe('SlashCommandApp', () => {
             ],
         );
 
+        selectionServiceSpy = jasmine.createSpyObj('selectionService',
+            ['replaceStandupper'],
+        );
+
         adminServiceSpy = jasmine.createSpyObj('adminService',
             ['checkIfAdmin'],
         );
@@ -28,7 +32,7 @@ describe('SlashCommandApp', () => {
             ['buildHelpCommmands'],
         );
 
-        subject = new SlashCommandApp(commandParserSpy, stateServiceSpy, adminServiceSpy, attachmentBuilderSpy)
+        subject = new SlashCommandApp(commandParserSpy, stateServiceSpy, adminServiceSpy, selectionServiceSpy, attachmentBuilderSpy)
     });
 
     describe('serviceAdminRequest', () => {
@@ -83,9 +87,7 @@ describe('SlashCommandApp', () => {
                 expect(result).toEqual({'text': 'Error: Invalid action. Enter `/seabotgo help` to see a list of available actions.'});
             });
 
-            describe('doing a forceReject', () => {
-                replaceStandupper = jasmine.createSpy('replaceStandupper');
-
+            describe('when doing a forceReject', () => {
                 beforeEach(() => {
                     stateServiceSpy.getSelectedStandupperNames.and.returnValue([
                         'name1',
@@ -97,7 +99,7 @@ describe('SlashCommandApp', () => {
                     );
                 });
 
-                it('returns an invalid standupper error message any standupper is not selected', () => {
+                it('returns an invalid standupper error message if any provided standupper is not already selected', () => {
                     commandParserSpy.parseCommand.and.returnValue({
                         action: 'forceReject',
                         args: ['name1', 'name2', 'name3']
@@ -110,10 +112,10 @@ describe('SlashCommandApp', () => {
 
                     expect(stateServiceSpy.getSelectedStandupperNames)
                         .toHaveBeenCalled();
-                    expect(result.text).toContain('Error: Invalid standupper provided.');
+                    expect(result.text).toContain('Error: Invalid standupper(s) provided.');
                 });
 
-                it('returns an invalid standupper error message any standupper is already rejected', () => {
+                it('returns an invalid standupper error message if any provided standupper is already rejected', () => {
                     stateServiceSpy.getRejectedStandupperNames.and.returnValue(
                         ['name1']
                     );
@@ -130,7 +132,7 @@ describe('SlashCommandApp', () => {
 
                     expect(stateServiceSpy.getSelectedStandupperNames)
                         .toHaveBeenCalled();
-                    expect(result.text).toContain('Error: Invalid standupper provided.');
+                    expect(result.text).toContain('Error: Invalid standupper(s) provided.');
                 });
 
                 it('replaces and records rejection for each standupper, returns a success message ', () => {
@@ -150,7 +152,8 @@ describe('SlashCommandApp', () => {
 
                     expect(stateServiceSpy.getSelectedStandupperNames)
                         .toHaveBeenCalled();
-                    expect(replaceStandupper.calls.allArgs()).toEqual(
+
+                    expect(selectionServiceSpy.replaceStandupper.calls.allArgs()).toEqual(
                         [
                             ['name1'],
                             ['name2']
@@ -192,9 +195,7 @@ describe('SlashCommandApp', () => {
                         'text': 'Available actions: ',
                         'attachments': expectedAttachments
                     });
-
                 });
-
             });
         });
     });

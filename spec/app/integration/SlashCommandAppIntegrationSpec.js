@@ -74,7 +74,7 @@ describe('SlashCommandApp Integration Test', () => {
             const response = HandleRequest(rejectCallback);
 
             expect(JSON.parse(response.payload)).toEqual({
-                text: 'Error: Invalid standupper provided. Check to make sure they are currently selected and not already rejected.'
+                text: 'Error: Invalid standupper(s) provided. Check to make sure they are currently selected and not already rejected.'
             })
         });
     });
