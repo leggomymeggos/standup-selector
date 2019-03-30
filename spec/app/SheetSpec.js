@@ -84,7 +84,7 @@ describe("SheetSpec", () => {
             expect(standupperSheet.rangeRowStart).toEqual(2);
             expect(standupperSheet.rangeColStart).toEqual(1);
             expect(standupperSheet.rangeRowLength).toEqual(numRowsWithHeader - 1);
-            expect(standupperSheet.rangeColLength).toEqual(6);
+            expect(standupperSheet.rangeColLength).toEqual(7);
         });
     });
 
@@ -101,7 +101,7 @@ describe("SheetSpec", () => {
             expect(adminSheet.rangeRowStart).toEqual(2);
             expect(adminSheet.rangeColStart).toEqual(1);
             expect(adminSheet.rangeRowLength).toEqual(numRowsWithHeader - 1);
-            expect(adminSheet.rangeColLength).toEqual(2);
+            expect(adminSheet.rangeColLength).toEqual(3);
         });
     });
 

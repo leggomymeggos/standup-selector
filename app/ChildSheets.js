@@ -1,8 +1,8 @@
 var FIRST_ROW_IGNORE_HEADER = 2;
 var FIRST_COL = 1;
-var NUM_ADMIN_COLUMNS = 2;
+var NUM_ADMIN_COLUMNS = 3;
 var NUM_STATE_COLUMNS = 6;
-var NUM_STANDUPPER_COLUMNS = 6;
+var NUM_STANDUPPER_COLUMNS = 7;
 
 AdminSheet.prototype = new Sheet;
 StateSheet.prototype = new Sheet;

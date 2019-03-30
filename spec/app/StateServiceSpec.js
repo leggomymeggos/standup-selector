@@ -207,4 +207,16 @@ describe('StateService', () => {
         });
 
     });
+
+    describe('validateCallbackId', () => {
+        it('returns whether the provided callback id is valid', () => {
+            stateSheetSpy.getLastRowNum.and.returnValue(1);
+            let result = subject.validateCallbackId('callbackName_1');
+            expect(result).toBe(true);
+
+            stateSheetSpy.getLastRowNum.and.returnValue(5);
+            result = subject.validateCallbackId('callbackName_1');
+            expect(result).toBe(false);
+        });
+    });
 });

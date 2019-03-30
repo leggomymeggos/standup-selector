@@ -10,12 +10,11 @@ function doPost(e) {
         var providedToken = payload.token;
 
         if (providedToken !== gScriptProperties.getProperty('SLACK_CALLBACK_TOKEN')) {
-            var output = ContentService.createTextOutput(JSON.stringify({'error': true}));
+            var output = ContentService.createTextOutput(JSON.stringify({'error': true, 'cause': 'Invalid callback token'}));
             output.setMimeType(ContentService.MimeType.JSON);
             return output;
         } else {
-            var newMessage = respondToInteraction(payload);
-            // var newMessage = new Initializer(gScriptProperties).newInteractiveButtonApp().respondToInteraction(payload);
+            var newMessage = new Initializer(gScriptProperties).newInteractiveButtonApp().respondToInteraction(payload);
 
             var output = ContentService.createTextOutput(JSON.stringify({'text': newMessage}));
             output.setMimeType(ContentService.MimeType.JSON);

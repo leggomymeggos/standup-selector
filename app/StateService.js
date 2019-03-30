@@ -28,7 +28,7 @@ function StateService(stateSheet) {
         return this.stateSheet.getDataValues()[0]
             .slice(1, 3)
             .filter(function (e) {
-                return e !== 'not-confirmed';
+                return e !== 'not-confirmed' && e !== '';
             })
     };
 
@@ -77,6 +77,11 @@ function StateService(stateSheet) {
 
         this.stateSheet.setDataValues(stateTable);
     };
+
+    this.validateCallbackId = function (callbackId) {
+        var issuanceId = callbackId.match(/\d+$/);
+        return issuanceId ? (parseInt(issuanceId[0]) === this.getCurrentIssuanceId()) : false;
+    }
 }
 
 if (typeof module !== 'undefined' && module.exports) {

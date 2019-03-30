@@ -6,6 +6,7 @@ function Standupper(row, index) {
     this.numTimesSelected = row[3];
     this.forceSelection = row[4] !== '';
     this.forceOmission = row[5] !== '';
+    this.dmUcid = row[6] === '' ? undefined : row[6];
 
     this.isForceSelected = function () {
         return this.forceSelection;
@@ -56,6 +57,7 @@ function Standupper(row, index) {
             this.numTimesSelected,
             this.forceSelection ? this.forceSelection : '',
             this.forceOmission ? this.forceOmission : '',
+            this.dmUcid
         ];
     };
 }

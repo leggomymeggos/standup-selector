@@ -21,9 +21,9 @@ describe('MessagingService', () => {
 
     describe('notifyStanduppersOfSelection', () => {
         it('should use the slackClient to sendMessage each standupper', () => {
-            let su1 = {slackName: 'name1', slackDmUcid: '123'};
-            let su2 = {slackName: 'name2', slackDmUcid: '456'};
-            let su3 = {slackName: 'name3', slackDmUcid: '789'};
+            let su1 = {slackName: 'name1', dmUcid: '123'};
+            let su2 = {slackName: 'name2', dmUcid: '456'};
+            let su3 = {slackName: 'name3', dmUcid: '789'};
 
             subject.notifyStanduppersOfSelection([su1, su2, su3], 'msg');
 
@@ -42,7 +42,7 @@ describe('MessagingService', () => {
     describe('sendMessage', () => {
         it('should use the slackClient to write to the correct channel', () => {
             let standupper = {
-                slackDmUcid: '12345'
+                dmUcid: '12345'
             };
 
             subject.sendMessage(standupper, 'msg');
@@ -55,7 +55,7 @@ describe('MessagingService', () => {
         it('should use the slackClient to write to the correct channel', () => {
             let standupper = {
                 slackName: 'name',
-                slackDmUcid: '12345'
+                dmUcid: '12345'
             };
 
             subject.notifyOfSelection(standupper, 'msg');
@@ -68,7 +68,7 @@ describe('MessagingService', () => {
             it('should use the channelService to retrieve one', () => {
                 let standupper = {
                     slackName: 'name',
-                    slackDmUcid: undefined,
+                    dmUcid: undefined,
                     email: 'email@email.com'
                 };
 

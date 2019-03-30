@@ -72,6 +72,11 @@ function TestEnvBuilder() {
         var self = this;
         var fakeProperties = new FakeProperties(this.propertyStore);
 
+        let fakeNextMonday = new Date(new Date('1/1/1000'));
+        getNextMonday = () => {
+            return fakeNextMonday;
+        };
+
         PropertiesService = {
             getScriptProperties: function () {
                 return fakeProperties;
@@ -113,15 +118,17 @@ function TestEnvBuilder() {
         UrlFetchApp = new function () {
             this.fetched = [];
 
-            this.fetch = function (target, opts) {
-                var request = {
-                    target: target,
-                    opts: opts
-                };
+            this.fetch = jasmine.createSpy('fetch');
 
-                this.fetched.push(request);
-                return request;
-            };
+            // this.fetch = function (target, opts) {
+            //     var request = {
+            //         target: target,
+            //         opts: opts
+            //     };
+            //
+            //     this.fetched.push(request);
+            //     return request;
+            // };
         };
     }
 }
