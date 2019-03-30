@@ -4,13 +4,14 @@ function IdentificationApp(standupperService, userInfoService) {
 
     this.identifyStanduppers = function () {
         var standuppers = this.standupperService.getStanduppers();
+        var self = this;
 
         standuppers.forEach(function (su) {
             if (su.slackName === '') {
-                var userInfo = userInfoService.getUserInfo(su.email);
+                var userInfo = self.userInfoService.getUserInfo(su.email);
 
                 su.slackName = userInfo.user.name;
-                standupperService.saveStandupper(su);
+                self.standupperService.saveStandupper(su);
             }
         });
     };

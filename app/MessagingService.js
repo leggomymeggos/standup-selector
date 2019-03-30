@@ -7,15 +7,15 @@ function MessagingService(channelService, slackClient) {
     };
 
     this.sendMessage = function(standupper, msg) {
-        var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper.email);
+        var dmUcid = standupper.dmUcid ? standupper.dmUcid : this.channelService.getDmUcid(standupper.email);
 
-        this.slackClient.writeToChannel(msg, slackDmUcid);
+        this.slackClient.writeToChannel(msg, dmUcid);
     };
 
     this.notifyOfSelection = function(standupper, msg) {
-        var slackDmUcid = standupper.slackDmUcid ? standupper.slackDmUcid : this.channelService.getDmUcid(standupper.email);
+        var dmUcid = standupper.dmUcid ? standupper.dmUcid : this.channelService.getDmUcid(standupper.email);
 
-        this.slackClient.writeToChannelWithSelectionAttachment(msg, slackDmUcid, standupper.slackName);
+        this.slackClient.writeToChannelWithSelectionAttachment(msg, dmUcid, standupper.slackName);
     };
 }
 
