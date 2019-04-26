@@ -60,9 +60,8 @@ describe('InteractiveButtonApp Integration Test', () => {
             const helpRequest = JSON.parse(fs.readFileSync('spec/app/integration/interactiveButtonApp/confirmationRequest.json', 'utf8'));
             const response = HandleRequest(helpRequest);
 
-            var expectResponseText = 'You have wisely accepted Standup bot\'s offer. You will help run standup the week of '
-                + new Date().toLocaleDateString()
-                + '. Glory to Standup bot!';
+            var expectResponseText = 'You have wisely accepted Standup bot\'s offer. You will help run standup the week of 3/29/2019. Glory to Standup bot!';
+
             expect(JSON.parse(response.payload).text).toEqual(expectResponseText);
         });
     });
