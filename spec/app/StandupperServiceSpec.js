@@ -70,4 +70,24 @@ describe('StandupperService', () => {
 
         expect(actual).toEqual(['name2', 'name3']);
     });
+
+    it('saveStanduppers writesStandupperData to sheet', () => {
+        var standupperData = [
+            'slackName',
+            'email',
+            'lastStandupRun',
+            'numTimesSelected',
+            true,
+            true,
+            'dmUcid'
+        ];
+
+        const updatedStandupper = new Standupper(standupperData);
+
+        subject.saveStandupper(updatedStandupper);
+
+        expect(standupperSheetSpy.setDataValues)
+            .toHaveBeenCalledWith(standupperData);
+
+    });
 });

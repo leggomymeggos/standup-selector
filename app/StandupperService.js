@@ -8,11 +8,11 @@ function StandupperService(standupperSheet) {
     };
 
     this.incrementSelection = function (standupper) {
-        var standupperTable = standupperSheet.getDataValues();
+        var standupperTable = this.standupperSheet.getDataValues();
         var standupperRow = standupperTable[standupper.id - 1];
 
         standupperRow[3] === "" ? standupperRow[3] = 1 : standupperRow[3] += 1;
-        standupperSheet.setDataValues(standupperTable);
+        this.standupperSheet.setDataValues(standupperTable);
     };
 
     this.addConfirmation = function (standupperName) {
@@ -20,10 +20,10 @@ function StandupperService(standupperSheet) {
             .map(function (su) {return su.slackName})
             .indexOf(standupperName);
 
-        var standupperTable = standupperSheet.getDataValues();
+        var standupperTable = this.standupperSheet.getDataValues();
         var standupperRow = standupperTable[standupperRowIndex];
         standupperRow[2] = getNextMonday().toLocaleDateString();
-        standupperSheet.setDataValues(standupperTable);
+        this.standupperSheet.setDataValues(standupperTable);
     };
 
     this.getOmittedStandupperNames = function () {
@@ -38,8 +38,8 @@ function StandupperService(standupperSheet) {
     };
 
     //TODO
-    this.saveStandupper = function () {
-
+    this.saveStandupper = function (standupper) {
+        this.standupperSheet.setDataValues(standupper.toDataArray());
     };
 }
 
