@@ -1,6 +1,6 @@
 doPost = require('../../app/Router');
 
-xdescribe('Router', () => {
+describe('Router', () => {
     let goodToken = 'GOOD-TOKEN';
 
     let slashCommandAppSpy, fakeAppProperties, fakeInitializer;
@@ -32,6 +32,7 @@ xdescribe('Router', () => {
 
         fakeInitializer = new FakeInitializer();
         fakeInitializer.newSlashCommandApp.and.returnValue(slashCommandAppSpy);
+        fakeInitializer.newInteractiveButtonApp.and.returnValue({respondToInteraction});
 
         Initializer = function () {
             return fakeInitializer;
@@ -40,6 +41,7 @@ xdescribe('Router', () => {
 
     function FakeInitializer() {
         this.newSlashCommandApp = jasmine.createSpy("newSlashCommandApp");
+        this.newInteractiveButtonApp = jasmine.createSpy("newInteractiveButtonApp");
     }
 
     describe('doPost', () => {
@@ -97,7 +99,10 @@ xdescribe('Router', () => {
                 const response = doPost(inboundRequest);
 
                 expect(ContentService.createTextOutput)
-                    .toHaveBeenCalledWith(JSON.stringify({'error': true}));
+                    .toHaveBeenCalledWith(JSON.stringify({
+                        'error': true,
+                        'cause': 'Invalid callback token'
+                    }));
                 expect(expectedOutput.setMimeType).toHaveBeenCalledWith(
                     'expectedContentType'
                 );

@@ -19,5 +19,8 @@
   "homepage": "https://github.com/robbyice/standup-selector#readme",
   "devDependencies": {
     "jasmine": "^3.2.0"
+  },
+  "dependencies": {
+    "npm": "^6.9.0"
   }
 }
