@@ -65,5 +65,4 @@ describe('InteractiveButtonApp Integration Test', () => {
             expect(JSON.parse(response.payload).text).toEqual(expectResponseText);
         });
     });
-
 });
