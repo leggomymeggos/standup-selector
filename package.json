@@ -18,9 +18,10 @@
   },
   "homepage": "https://github.com/robbyice/standup-selector#readme",
   "devDependencies": {
+    "@google/clasp": "^2.1.0",
     "jasmine": "^3.2.0"
   },
   "dependencies": {
-    "npm": "^6.9.0"
+    "npm": "^6.9.2"
   }
 }
