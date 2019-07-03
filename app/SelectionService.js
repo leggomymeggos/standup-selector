@@ -5,8 +5,7 @@ function SelectionService(standupperService, algorithmService) {
     this.pickStanduppers = function () {
         var selected = [];
 
-        var randomizedStanduppers = this.standupperService.getStanduppers()
-            .sort(randomize);
+        var randomizedStanduppers = shuffle(this.standupperService.getStanduppers());
 
         randomizedStanduppers.forEach(function (su) {
             if (su.isForceSelected() && selected.filter(onlyUnique).length < 2) {

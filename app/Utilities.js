@@ -20,6 +20,17 @@ function randomize() {
     return .5 - Math.random();
 }
 
+// https://stackoverflow.com/a/12646864
+function shuffle(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
 function getNextMonday() {
     var today = new Date();
     var nextMonday = new Date();
@@ -35,7 +46,8 @@ function onlyUnique(value, index, self) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         onlyUnique: onlyUnique,
-        mergeObjs: mergeObjs
+        mergeObjs: mergeObjs,
+        shuffle: shuffle
     };
 }
 

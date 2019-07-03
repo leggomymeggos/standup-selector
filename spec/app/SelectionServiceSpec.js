@@ -1,6 +1,8 @@
 SelectionService = require('../../app/SelectionService');
 AlgorithmService = require('../../app/AlgorithmService');
 onlyUnique = require('../../app/Utilities').onlyUnique;
+shuffle = require('../../app/Utilities').shuffle;
+
 
 describe('SelectionService', () => {
     let subject;
@@ -14,12 +16,6 @@ describe('SelectionService', () => {
         algorithmServiceSpy = jasmine.createSpyObj(
             'algorithmService', ['selectRandomlyByWeight']
         );
-
-        //force Array.sort(randomize) to just reverse order
-        randomize = () => {
-            return 1;
-        };
-        //
 
         subject = new SelectionService(standupperServiceSpy, algorithmServiceSpy);
     });
@@ -45,10 +41,9 @@ describe('SelectionService', () => {
                 const result = subject.pickStanduppers();
 
                 expect(result.length).toEqual(2);
-                const orderedResultNames = result.map((su) => {
-                    return su.name;
-                });
-                expect(orderedResultNames).toEqual(['su3', 'su2'])
+                const orderedResultNames = result.map((su) => su.name);
+                expect(orderedResultNames).toContain('su2');
+                expect(orderedResultNames).toContain('su3');
             });
 
             describe('when there are more than two forceSelected people', () => {
@@ -57,16 +52,17 @@ describe('SelectionService', () => {
                     suSpy2.isForceSelected.and.returnValue(true);
                     suSpy3.isForceSelected.and.returnValue(true);
 
-                    const result = subject.pickStanduppers();
+                    const result1 = subject.pickStanduppers();
+                    expect(result1.length).toEqual(2);
 
-                    expect(result.length).toEqual(2);
-                    const orderedResultNames = result.map(function (su) {
-                        return su.name;
-                    });
-                    expect(orderedResultNames).toEqual(['su3', 'su2'])
+                    const result2 = subject.pickStanduppers();
+                    expect(result2.length).toEqual(2);
+
+                    const result1Names = result1.map((su) => su.name);
+                    const result2Names = result2.map((su) => su.name);
+                    expect(result1Names.join()).not.toEqual(result2Names.join())
                 });
             });
-
         });
 
         describe('handling forceOmission', () => {
