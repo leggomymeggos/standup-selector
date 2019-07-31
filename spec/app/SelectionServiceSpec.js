@@ -66,7 +66,6 @@ describe('SelectionService', () => {
         });
 
         describe('handling forceOmission', () => {
-
             beforeEach(() => {
                 suSpy1 = new TestStandupper('su1');
                 suSpy2 = new TestStandupper('su2');

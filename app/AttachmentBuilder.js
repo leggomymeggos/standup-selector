@@ -1,11 +1,13 @@
 function AttachmentBuilder(stateService) {
     this.stateService = stateService;
     this.buildSelectionPrompt = function (slackName) {
+        var currentIssuanceId = this.stateService.getCurrentIssuanceId();
+        console.log("notifying " + slackName + " with currentIssuanceId:", currentIssuanceId);
         return [
             {
                 'text': 'Glorious standup bot, bot of bots, selector of standuppers, has generously chosen YOU, ' + slackName + ', to run standup for the upcoming week.',
                 'fallback': 'Interactive messages not supported via this client',
-                'callback_id': slackName + '_' + this.stateService.getCurrentIssuanceId(),
+                'callback_id': slackName + '_' + currentIssuanceId,
                 'color': '#3AA3E3',
                 'attachment_type': 'default',
                 'actions': [

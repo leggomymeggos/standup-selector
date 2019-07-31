@@ -11,7 +11,6 @@ function InteractiveButtonApp(stateService, adminService, selectionService, stan
             if (payload.actions[0].value === 'yes') {
                 return this.handleConfirmation(nameOnCallback);
 
-
                 // 'You have wisely accepted standup bot\'s offer. You will help run standup the week of 1/1 with person2. Glory to standup bot!'
             } else if (payload.actions[0].value === 'no') {
                 if (stateService.getRejectedStandupperNames().includes(nameOnCallback)) {

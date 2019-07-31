@@ -79,8 +79,11 @@ function StateService(stateSheet) {
     };
 
     this.validateCallbackId = function (callbackId) {
+        console.log("validating callback id:", callbackId);
+        var currentIssuanceId = this.getCurrentIssuanceId();
+        console.log("current issuance id:", currentIssuanceId);
         var issuanceId = callbackId.match(/\d+$/);
-        return issuanceId ? (parseInt(issuanceId[0]) === this.getCurrentIssuanceId()) : false;
+        return issuanceId ? (parseInt(issuanceId[0]) === currentIssuanceId) : false;
     }
 }
 
