@@ -8,7 +8,8 @@ function AlgorithmService() {
 
         var selected = false;
 
-        standuppers.slice().sort(randomize).some(function (standupper) {
+        shuffle(randomProbables.slice()).some(function (standupper) {
+            console.log("Calculating selection probability for standupper " + standupper);
             random -= standupper.getProbability();
 
             if (random <= 0) {

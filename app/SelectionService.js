@@ -25,8 +25,23 @@ function SelectionService(standupperService, algorithmService) {
         return selected.filter(onlyUnique);
     };
 
-    this.replaceStandupper = function (nameToReplace) {
+    this.replaceStandupper = function () {
+        var standuppers = this.standupperService.getStanduppers();
+        var rejected = this.standupperService.getRejectedStandupperNames();
+        var alreadySelected = this.standupperService.getSelectedStandupperNames();
+        var forceOmitted = this.standupperService.getOmittedStandupperNames();
+        var newSelections = [];
 
+        while (newSelections
+            .filter(function (e) {
+                return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && !forceOmitted.includes(e.slackName);
+            }).length < 1) {
+            newSelections.push(this.algorithmService.selectRandomlyByWeight(standuppers));
+        }
+
+        return newSelections.filter(function (e) {
+            return !rejected.includes(e.slackName) && !alreadySelected.includes(e.slackName) && !forceOmitted.includes(e.slackName);
+        }).slice(0, 1);
     };
 }
 

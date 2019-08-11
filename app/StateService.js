@@ -35,7 +35,6 @@ function StateService(stateSheet) {
     this.getRejectedStandupperNames = function () {
         this.stateSheet.getLatestState();
         return this.stateSheet.getDataValues()[0][4].split(', ');
-
     };
 
     this.getSelectedStandupperNames = function () {

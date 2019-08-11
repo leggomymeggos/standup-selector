@@ -24,7 +24,7 @@ function Initializer(appProperties) {
         this.initializeShared();
 
         this.initializeSelectionService();
-        return new InteractiveButtonApp(this.stateService, this.adminService, this.selectionService, this.standupperService);
+        return new InteractiveButtonApp(this.stateService, this.adminService, this.selectionService, this.standupperService, this.messagingService);
     };
 
     this.initializeSelectionService = function () {

@@ -1,8 +1,9 @@
-function InteractiveButtonApp(stateService, adminService, selectionService, standupperService) {
+function InteractiveButtonApp(stateService, adminService, selectionService, standupperService, messagingService) {
     this.stateService = stateService;
     this.adminService = adminService;
     this.selectionService = selectionService;
     this.standupperService = standupperService;
+    this.messagingService = messagingService;
 
     this.respondToInteraction = function (payload) {
         if (this.stateService.validateCallbackId(payload.callback_id)) {
@@ -87,9 +88,14 @@ function InteractiveButtonApp(stateService, adminService, selectionService, stan
             + this.stateService.getCurrentStandupDateString()
         );
 
-        this.selectionService.replaceStandupper(nameOnCallback);
+        var replacementStandupper = this.selectionService.replaceStandupper(nameOnCallback);
+        this.adminService.messageAdmins('[ADMIN]: ' + replacementStandupper[0].slackName +
+            ' has been selected as a replacement to run standup the week of ' + this.stateService.getCurrentStandupDateString());
+        this.messagingService.notifyStanduppersOfSelection(replacementStandupper,
+            'Glory to the bot! You have been selected as a replacement to run standup the week of ' + this.stateService.getCurrentStandupDateString());
+        this.stateService.recordSelection(replacementStandupper[0].slackName);
+        this.standupperService.incrementSelection(replacementStandupper[0]);
     };
-
 }
 
 if (typeof module !== 'undefined' && module.exports) {

@@ -10,7 +10,7 @@ describe('SelectionService', () => {
 
     beforeEach(() => {
         standupperServiceSpy = jasmine.createSpyObj(
-            'standupperService', ['getStanduppers']
+            'standupperService', ['getStanduppers', 'getSelectedStandupperNames', 'getRejectedStandupperNames', 'getOmittedStandupperNames']
         );
 
         algorithmServiceSpy = jasmine.createSpyObj(
@@ -119,6 +119,56 @@ describe('SelectionService', () => {
                 expect(result).toEqual([suSpy3, suSpy4]);
                 expect(algorithmServiceSpy.selectRandomlyByWeight.calls.count()).toEqual(4);
             });
+        });
+    });
+
+    describe('when rejecting standuppers', () => {
+        let suSpy1, suSpy2, suSpy3;
+
+        beforeEach(() => {
+            suSpy1 = new TestStandupper('su1');
+            suSpy2 = new TestStandupper('su2');
+            suSpy3 = new TestStandupper('su3');
+
+            standupperServiceSpy.getStanduppers.and.returnValue([
+                suSpy1, suSpy2, suSpy3
+            ]);
+            standupperServiceSpy.getRejectedStandupperNames.and.returnValue([]);
+            standupperServiceSpy.getOmittedStandupperNames.and.returnValue([]);
+            standupperServiceSpy.getSelectedStandupperNames.and.returnValue([]);
+        });
+        it('does not pick a standupper who has rejected', () => {
+            algorithmServiceSpy.selectRandomlyByWeight.and.returnValue([
+                suSpy2, suSpy2, suSpy3
+            ]);
+            standupperServiceSpy.getRejectedStandupperNames.and.returnValue([suSpy2.name]);
+
+            var replacementStandupper = subject.replaceStandupper();
+
+            expect(replacementStandupper).not.toContain(suSpy2);
+        });
+
+        it('does not pick a standupper who is already selected', () => {
+            algorithmServiceSpy.selectRandomlyByWeight.and.returnValue([
+                suSpy1, suSpy2
+            ]);
+            standupperServiceSpy.getSelectedStandupperNames.and.returnValue(
+                [suSpy1.name]
+            );
+
+            var replacementStandupper = subject.replaceStandupper();
+
+            expect(replacementStandupper).not.toContain(suSpy1);
+        });
+
+        it('does not pick an omitted standupper', () => {
+            algorithmServiceSpy.selectRandomlyByWeight.and.returnValue([
+                suSpy3, suSpy1
+            ]);
+            standupperServiceSpy.getOmittedStandupperNames.and.returnValue([suSpy3.name]);
+            var replacementStandupper = subject.replaceStandupper();
+
+            expect(replacementStandupper).not.toContain(suSpy3);
         });
     });
 });
