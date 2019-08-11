@@ -4,7 +4,7 @@ describe('InteractiveButtonApp', () => {
 
     let subject;
 
-    let stateServiceSpy, adminServiceSpy, selectionServiceSpy, standupperServiceSpy;
+    let stateServiceSpy, adminServiceSpy, selectionServiceSpy, standupperServiceSpy, messagingServiceSpy;
 
     beforeEach(() => {
         stateServiceSpy = jasmine.createSpyObj('stateService',
@@ -14,7 +14,8 @@ describe('InteractiveButtonApp', () => {
                 'recordRejection',
                 'recordConfirmation',
                 'getCurrentStandupDateString',
-                'getConfirmedStandupperNames'
+                'getConfirmedStandupperNames',
+                'recordSelection'
             ],
         );
 
@@ -32,11 +33,17 @@ describe('InteractiveButtonApp', () => {
 
         standupperServiceSpy = jasmine.createSpyObj('standupperService',
             [
-                'addConfirmation'
+                'addConfirmation',
+                'incrementSelection'
             ],
         );
+        messagingServiceSpy = jasmine.createSpyObj('messagingService',
+            [
+                'notifyStanduppersOfSelection'
+            ]
+        );
 
-        subject = new InteractiveButtonApp(stateServiceSpy, adminServiceSpy, selectionServiceSpy, standupperServiceSpy)
+        subject = new InteractiveButtonApp(stateServiceSpy, adminServiceSpy, selectionServiceSpy, standupperServiceSpy, messagingServiceSpy)
     });
 
     describe('respondToInteraction', () => {
@@ -161,19 +168,28 @@ describe('InteractiveButtonApp', () => {
                     beforeEach(() => {
                         stateServiceSpy.getRejectedStandupperNames.and.returnValue([]);
                         stateServiceSpy.getCurrentStandupDateString.and.returnValue('1/1');
+                        selectionServiceSpy.replaceStandupper.and.returnValue([{
+                            slackName: 'replacement-standupper'
+                        }]);
                     });
 
                     it('should record the rejection, message admins, and replace the standupper', () => {
 
                         const response = subject.respondToInteraction(payload);
 
-                        expect(response).toEqual('You will be replaced...for running standup');
+                        expect(response).toEqual('You will be replaced... for running standup');
                         expect(stateServiceSpy.recordRejection).toHaveBeenCalledWith('person');
                         expect(stateServiceSpy.getCurrentStandupDateString).toHaveBeenCalled();
                         expect(adminServiceSpy.messageAdmins).toHaveBeenCalledWith(
                             '[ADMIN]: person has rejected their selection for running standup the week of 1/1'
                         );
                         expect(selectionServiceSpy.replaceStandupper).toHaveBeenCalledWith('person');
+                        expect(messagingServiceSpy.notifyStanduppersOfSelection).toHaveBeenCalledWith(
+                            [{slackName: 'replacement-standupper'}],
+                            'Glory to the bot! You have been selected as a replacement to run standup the week of 1/1'
+                        );
+                        expect(stateServiceSpy.recordSelection).toHaveBeenCalledWith('replacement-standupper');
+                        expect(standupperServiceSpy.incrementSelection).toHaveBeenCalledWith({slackName: 'replacement-standupper'})
                     });
                 });
             });

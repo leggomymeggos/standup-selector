@@ -18,7 +18,7 @@ function InteractiveButtonApp(stateService, adminService, selectionService, stan
                     return 'You have already rejected this standup issuance and will be replaced';
                 }
                 this.handleRejection(nameOnCallback);
-                return 'You will be replaced...for running standup';
+                return 'You will be replaced... for running standup';
             } else {
                 return 'Error';
             }
