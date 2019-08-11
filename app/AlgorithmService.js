@@ -9,7 +9,6 @@ function AlgorithmService() {
         var selected = false;
 
         shuffle(randomProbables.slice()).some(function (standupper) {
-            console.log("Calculating selection probability for standupper " + standupper);
             random -= standupper.getProbability();
 
             if (random <= 0) {
