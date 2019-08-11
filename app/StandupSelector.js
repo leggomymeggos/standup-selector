@@ -19,7 +19,7 @@ var adminService = new AdminService(messagingService, adminSheet, stateService);
 var commandParser = new CommandParser();
 
 var algorithmService = new AlgorithmService();
-var selectionService = new SelectionService(standupperService, algorithmService);
+var selectionService = new SelectionService(standupperService, stateService, algorithmService);
 
 var standuppers = standupperService.getStanduppers();
 

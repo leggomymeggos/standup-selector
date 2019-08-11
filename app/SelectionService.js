@@ -1,5 +1,6 @@
-function SelectionService(standupperService, algorithmService) {
+function SelectionService(standupperService, stateService, algorithmService) {
     this.standupperService = standupperService;
+    this.stateService = stateService;
     this.algorithmService = algorithmService;
 
     this.pickStanduppers = function () {
@@ -27,8 +28,8 @@ function SelectionService(standupperService, algorithmService) {
 
     this.replaceStandupper = function () {
         var standuppers = this.standupperService.getStanduppers();
-        var rejected = this.standupperService.getRejectedStandupperNames();
-        var alreadySelected = this.standupperService.getSelectedStandupperNames();
+        var rejected = this.stateService.getRejectedStandupperNames();
+        var alreadySelected = this.stateService.getSelectedStandupperNames();
         var forceOmitted = this.standupperService.getOmittedStandupperNames();
         var newSelections = [];
 

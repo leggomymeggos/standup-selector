@@ -6,18 +6,22 @@ shuffle = require('../../app/Utilities').shuffle;
 
 describe('SelectionService', () => {
     let subject;
-    let standupperServiceSpy, algorithmServiceSpy;
+    let standupperServiceSpy, algorithmServiceSpy, stateServiceSpy;
 
     beforeEach(() => {
         standupperServiceSpy = jasmine.createSpyObj(
-            'standupperService', ['getStanduppers', 'getSelectedStandupperNames', 'getRejectedStandupperNames', 'getOmittedStandupperNames']
+            'standupperService', ['getStanduppers', 'getOmittedStandupperNames']
+        );
+
+        stateServiceSpy = jasmine.createSpyObj(
+            'stateService', ['getSelectedStandupperNames', 'getRejectedStandupperNames']
         );
 
         algorithmServiceSpy = jasmine.createSpyObj(
             'algorithmService', ['selectRandomlyByWeight']
         );
 
-        subject = new SelectionService(standupperServiceSpy, algorithmServiceSpy);
+        subject = new SelectionService(standupperServiceSpy, stateServiceSpy, algorithmServiceSpy);
     });
 
     describe('when picking standuppers', () => {
@@ -133,15 +137,15 @@ describe('SelectionService', () => {
             standupperServiceSpy.getStanduppers.and.returnValue([
                 suSpy1, suSpy2, suSpy3
             ]);
-            standupperServiceSpy.getRejectedStandupperNames.and.returnValue([]);
             standupperServiceSpy.getOmittedStandupperNames.and.returnValue([]);
-            standupperServiceSpy.getSelectedStandupperNames.and.returnValue([]);
+            stateServiceSpy.getRejectedStandupperNames.and.returnValue([]);
+            stateServiceSpy.getSelectedStandupperNames.and.returnValue([]);
         });
         it('does not pick a standupper who has rejected', () => {
             algorithmServiceSpy.selectRandomlyByWeight.and.returnValue([
                 suSpy2, suSpy2, suSpy3
             ]);
-            standupperServiceSpy.getRejectedStandupperNames.and.returnValue([suSpy2.name]);
+            stateServiceSpy.getRejectedStandupperNames.and.returnValue([suSpy2.name]);
 
             var replacementStandupper = subject.replaceStandupper();
 
@@ -152,7 +156,7 @@ describe('SelectionService', () => {
             algorithmServiceSpy.selectRandomlyByWeight.and.returnValue([
                 suSpy1, suSpy2
             ]);
-            standupperServiceSpy.getSelectedStandupperNames.and.returnValue(
+            stateServiceSpy.getSelectedStandupperNames.and.returnValue(
                 [suSpy1.name]
             );
 

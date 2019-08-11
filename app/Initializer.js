@@ -31,10 +31,10 @@ function Initializer(appProperties) {
         this.standupperSheet = this.sheetFactory.getStandupperSheet();
         this.standupperService = new StandupperService(this.standupperSheet);
         this.algorithmService = new AlgorithmService();
-        this.selectionService = new SelectionService(this.standupperService, this.algorithmService);
+        this.selectionService = new SelectionService(this.standupperService, this.stateService, this.algorithmService);
     };
 
-    this.initializeMessaging = function() {
+    this.initializeMessaging = function () {
         this.attachmentBuilder = new AttachmentBuilder(this.stateService);
         this.slackClient = new SlackClient(this.appproperties, this.attachmentBuilder);
         this.userInfoService = new UserInfoService(this.slackClient);

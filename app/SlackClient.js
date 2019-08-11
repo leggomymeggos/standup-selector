@@ -20,9 +20,7 @@ function SlackClient(appProperties, attachmentBuilder) {
             'email': email
         };
 
-        console.log("Fetching user info for " + email);
         var resp = this.postSlackFormUrlEncoded(body, this.userInfoByEmailUrl);
-        console.log("User info response: " + resp);
         return JSON.parse(resp.getContentText());
     };
 

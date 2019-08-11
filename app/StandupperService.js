@@ -34,7 +34,6 @@ function StandupperService(standupperSheet) {
             .map(function (su) {
                 return su.slackName;
             });
-
     };
 
     //TODO
