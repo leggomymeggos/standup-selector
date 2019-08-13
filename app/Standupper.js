@@ -16,7 +16,7 @@ function Standupper(row, index) {
         return this.forceOmission;
     };
 
-    this.getNormalizedFrequencyScore = function () {
+    this.getNormalizedFrequencyScore = function (standuppers) {
         //which is faster i wonder
 
 //      var maxTimesSelected = standuppers.reduce(function(acc, ele) {
@@ -31,15 +31,15 @@ function Standupper(row, index) {
             (this.getNumTimesSelected() === maxTimesSelected ? 100 : (100 * this.getNumTimesSelected()) / maxTimesSelected);
     };
 
-    this.getNormalizedProximityScore = function () {
+    this.getNormalizedProximityScore = function (standuppers) {
         var maxNumWeeksSince = standuppers.reduce(function (acc, ele) {
             return Math.max(acc, ele.getNumWeeksSinceLastStandupRun());
         }, standuppers[0].getNumWeeksSinceLastStandupRun());
 
         return this.getNumWeeksSinceLastStandupRun() === maxNumWeeksSince ? 100 : (100 * this.getNumWeeksSinceLastStandupRun()) / maxNumWeeksSince;
     };
-    this.getProbability = function () {
-        return Math.floor((this.getNormalizedProximityScore() * 0.60) + (this.getNormalizedFrequencyScore() * 0.40));
+    this.getProbability = function (standuppers) {
+        return Math.floor((this.getNormalizedProximityScore(standuppers) * 0.60) + (this.getNormalizedFrequencyScore(standuppers) * 0.40));
     };
     this.getNumWeeksSinceLastStandupRun = function () {
         return Math.floor((new Date() - this.lastStandupRun) / 1000 / 60 / 60 / 24 / 7);

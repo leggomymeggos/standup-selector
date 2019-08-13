@@ -1,3 +1,5 @@
+require('./RequireEverything');
+
 var fs = require('fs');
 HandleRequest = require('../../../app/Router');
 TestUtil = require('./TestEnvironmentUtil');

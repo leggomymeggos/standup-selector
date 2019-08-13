@@ -35,7 +35,6 @@ function swapToProdEnvironment() {
     appProperties.setProperty('STANDUPPER_SHEET_NAME', 'standuppers');
 }
 
-
 function runSelectionApp() {
     var selectedStanduppers = selectionService.pickStanduppers();
 
@@ -169,13 +168,13 @@ function replaceStandupper(replacedName) {
 //TODO - still being used herein by replacement flow
 function selectRandomStandupperByProbability() {
     var totalWeight = standuppers.reduce(function (acc, ele) {
-        return acc + ele.getProbability();
+        return acc + ele.getProbability(standuppers);
     }, 0);
     var random = Math.floor(Math.random() * totalWeight) + 1;
     var selected;
 
     standuppers.slice().sort(randomize).some(function (standupper) {
-        random -= standupper.getProbability();
+        random -= standupper.getProbability(standuppers);
 
         if (random <= 0) {
             selected = standupper;

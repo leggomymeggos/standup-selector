@@ -1,5 +1,5 @@
 function Initializer(appProperties) {
-    this.appproperties = appProperties;
+    this.appProperties = appProperties;
     this.sheetFactory = new SheetFactory(appProperties);
 
     this.initializeShared = function () {
@@ -36,7 +36,7 @@ function Initializer(appProperties) {
 
     this.initializeMessaging = function () {
         this.attachmentBuilder = new AttachmentBuilder(this.stateService);
-        this.slackClient = new SlackClient(this.appproperties, this.attachmentBuilder);
+        this.slackClient = new SlackClient(this.appProperties, this.attachmentBuilder);
         this.userInfoService = new UserInfoService(this.slackClient);
         this.channelService = new ChannelService(this.userInfoService, this.slackClient);
         this.messagingService = new MessagingService(this.channelService, this.slackClient);
